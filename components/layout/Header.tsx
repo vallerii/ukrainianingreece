@@ -4,16 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { nav, site } from "@/lib/site";
+import Image from "next/image";
 
 function Logo({ solid }: { solid: boolean }) {
   return (
     <Link href="/" className="group flex items-center gap-3" aria-label={site.name}>
-      <span className="relative block h-10 w-10 overflow-hidden rounded-full ring-1 ring-black/10">
-        <span className="absolute inset-x-0 top-0 h-1/2 bg-sky-700" />
-        <span className="absolute inset-x-0 bottom-0 h-1/2 bg-wheat-400" />
-        <span className="absolute inset-0 grid place-items-center font-display text-[0.72rem] font-bold text-white mix-blend-luminosity">
-          УД
-        </span>
+      <span className="relative block h-12 w-12 overflow-hidden rounded-full ring-1 ring-black/10">
+        <Image src="/logo.jpg" alt={site.name} width={60} height={60} />
       </span>
       <span className="hidden leading-[1.05] sm:block">
         <span

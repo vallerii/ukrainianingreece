@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { nav, site } from "@/lib/site";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -11,17 +12,8 @@ export default function Footer() {
         <div className="grid gap-14 lg:grid-cols-[1.25fr_2fr]">
           <div>
             <Link href="/" className="flex items-center gap-3">
-              <span className="relative block h-11 w-11 overflow-hidden rounded-full">
-                <span className="absolute inset-x-0 top-0 h-1/2 bg-sky-700" />
-                <span className="absolute inset-x-0 bottom-0 h-1/2 bg-wheat-400" />
-                <span className="absolute inset-0 grid place-items-center font-display text-[0.75rem] font-bold text-white mix-blend-luminosity">
-                  УД
-                </span>
-              </span>
-              <span className="font-display text-[0.9rem] font-semibold leading-tight tracking-tight">
-                Об'єднана українська
-                <br />
-                діаспора в Греції
+              <span className="relative block h-90 w-90 overflow-hidden rounded-full">
+                 <Image src="/logo.jpg" alt={site.name} width={384} height={384} />
               </span>
             </Link>
 
