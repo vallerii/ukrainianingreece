@@ -8,10 +8,10 @@ export default function Partners() {
   const row = [...partners, ...partners];
 
   return (
-    <section className="overflow-hidden border-y border-line bg-paper py-16">
+    <section className="relative overflow-hidden bg-sky-deep py-20">
       <div className="shell">
         <Reveal>
-          <p className="eyebrow text-mute">Партнери та підтримка</p>
+          <p className="eyebrow text-wheat-400">Партнери та підтримка</p>
         </Reveal>
       </div>
 
@@ -24,7 +24,7 @@ export default function Partners() {
           {row.map((p, i) => (
             <span
               key={i}
-              className="whitespace-nowrap font-display text-[1.3rem] font-semibold tracking-tight text-mute/70 transition-colors hover:text-ink md:text-[1.7rem]"
+              className="whitespace-nowrap font-display text-[1.3rem] font-medium tracking-tight text-sky-100/55 transition-colors hover:text-wheat-400 md:text-[1.7rem]"
             >
               {p}
             </span>

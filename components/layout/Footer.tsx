@@ -45,7 +45,7 @@ export default function Footer() {
                   rel="noreferrer"
                   aria-label={s.label}
                   title={s.label}
-                  className="grid h-11 w-11 place-items-center rounded-full border border-white/18 text-sky-100/80 transition-colors hover:border-wheat-400 hover:text-wheat-400"
+                  className="flex h-11 w-11 justify-center items-center rounded-full border border-white/18 text-sky-100/80 transition-colors hover:border-wheat-400 hover:text-wheat-400"
                 >
                   <SocialIcon name={s.icon} className="h-[1.15rem] w-[1.15rem]" />
                 </a>

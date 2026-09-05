@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
+import { usePathname } from "next/navigation";
 import { nav, site } from "@/lib/site";
 import Image from "next/image";
 import SocialIcon from "@/components/ui/SocialIcon";
@@ -40,13 +41,18 @@ function Logo({ solid }: { solid: boolean }) {
 }
 
 export default function Header() {
-  const [solid, setSolid] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const { scrollY } = useScroll();
+  const pathname = usePathname();
 
-  useMotionValueEvent(scrollY, "change", (v) => setSolid(v > 80));
+  useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 80));
 
+  // Прозора шапка зі світлим текстом доречна лише над темним hero головної.
+  // На всіх інших сторінках фон світлий — шапка має бути щільною одразу.
+  const overHero = pathname === "/" && !scrolled;
+  const solid = !overHero;
   const tone = solid || mobile;
 
   return (
@@ -62,10 +68,18 @@ export default function Header() {
         {/* utility bar */}
         <div
           className={`hidden overflow-hidden border-b transition-all duration-500 lg:block ${
-            solid ? "h-0 border-transparent opacity-0" : "h-11 border-white/15 opacity-100"
+            scrolled
+              ? "h-0 border-transparent opacity-0"
+              : overHero
+                ? "h-11 border-white/15 opacity-100"
+                : "h-11 border-line opacity-100"
           }`}
         >
-          <div className="shell flex h-11 items-center justify-end gap-7 text-[0.72rem] text-white/85">
+          <div
+            className={`shell flex h-11 items-center justify-end gap-7 text-[0.72rem] ${
+              overHero ? "text-white/85" : "text-ink-soft"
+            }`}
+          >
             <div className="flex items-center gap-5">
               {site.socials.map((s) => (
                 <a
@@ -75,13 +89,15 @@ export default function Header() {
                   rel="noreferrer"
                   aria-label={s.label}
                   title={s.label}
-                  className="text-white/85 transition-colors hover:text-wheat-400"
+                  className={`transition-colors ${
+                    overHero ? "text-white/85 hover:text-wheat-400" : "text-mute hover:text-sky-700"
+                  }`}
                 >
                   <SocialIcon name={s.icon} className="h-[1.05rem] w-[1.05rem]" />
                 </a>
               ))}
             </div>
-            <span className="h-3.5 w-px bg-white/25" />
+            <span className={`h-3.5 w-px ${overHero ? "bg-white/25" : "bg-line"}`} />
             <div className="flex items-center gap-2.5">
               {site.languages.map((l, i) => (
                 <button
@@ -97,13 +113,14 @@ export default function Header() {
                 </button>
               ))}
             </div>
-            <span className="h-3.5 w-px bg-white/25" />
-            <Link
+            <span className={`h-3.5 w-px ${overHero ? "bg-white/25" : "bg-line"}`} />
+            +30 000 000 000
+            {/* <Link
               href="/#doluchytysia"
               className="rounded-full bg-wheat-400 px-4 py-1.5 font-medium uppercase tracking-[0.14em] text-ink transition-colors hover:bg-white"
             >
               Долучитися
-            </Link>
+            </Link> */}
           </div>
         </div>
 
@@ -116,12 +133,12 @@ export default function Header() {
               <div key={item.href} onMouseEnter={() => setOpen(item.label)}>
                 <Link
                   href={item.href}
-                  className={`relative block px-3.5 py-2 text-[0.82rem] font-medium tracking-tight transition-colors ${
+                  className={`relative block px-3.5 py-2 text-[14px] font-regular tracking-tight transition-colors ${
                     tone ? "text-ink-soft hover:text-ink" : "text-white/90 hover:text-white"
                   }`}
                 >
                   {item.label}
-                  {item.children && <span className="ml-1.5 text-[0.6rem] opacity-60">▾</span>}
+                  {item.children && <span className="ml-1.5 text-[14px] opacity-60">▾</span>}
                   {open === item.label && (
                     <motion.span
                       layoutId="nav-underline"
@@ -289,13 +306,13 @@ export default function Header() {
                 </div>
               </div>
 
-              <Link
+              {/* <Link
                 href="/#doluchytysia"
                 onClick={() => setMobile(false)}
                 className="mt-6 block rounded-full border border-ink/20 py-4 text-center text-sm font-medium uppercase tracking-[0.14em] text-ink"
               >
                 Долучитися
-              </Link>
+              </Link> */}
 
               <Link
                 href="/pidtrymaty"

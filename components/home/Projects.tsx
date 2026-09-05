@@ -23,13 +23,12 @@ export default function Projects() {
   }
 
   return (
-    <section id="proyekty" className="relative overflow-hidden bg-ink py-24 md:py-32">
+    <section id="proyekty" className="relative overflow-hidden bg-paper py-24 md:py-32">
       <div className="shell">
         <SectionHead
           eyebrow="Проєкти-сателіти"
           title="Школи, клуби та ініціативи, що працюють як одна спільнота"
           link="/proyekty"
-          tone="dark"
         />
 
         <div ref={wrap} onMouseMove={onMove} className="relative">
@@ -67,39 +66,39 @@ export default function Projects() {
                 href={p.href}
                 onMouseEnter={() => setHover(idx)}
                 onMouseLeave={() => setHover(null)}
-                className="group relative block border-b border-white/12 py-8 md:py-10"
+                className="group relative block border-b border-line py-8 md:py-10"
               >
                 <motion.span
-                  className="absolute inset-x-0 bottom-0 h-px bg-wheat-400"
+                  className="absolute inset-x-0 bottom-0 h-px bg-sky-700"
                   initial={false}
                   animate={{ scaleX: hover === idx ? 1 : 0 }}
                   style={{ originX: 0 }}
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 />
                 <div className="grid items-baseline gap-3 md:grid-cols-[4rem_1fr_auto] md:gap-8">
-                  <span className="font-display text-sm text-white/35">{p.n}</span>
+                  <span className="font-display text-sm text-mute/70">{p.n}</span>
                   <div className="max-w-3xl">
                     <motion.h3
                       animate={{ x: hover === idx ? 14 : 0 }}
                       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                      className="display text-[clamp(1.5rem,3.2vw,2.6rem)] text-paper"
+                      className="display text-[clamp(1.5rem,3.2vw,2.6rem)] text-ink"
                     >
                       {p.title}
                     </motion.h3>
                     <motion.p
                       animate={{
                         x: hover === idx ? 14 : 0,
-                        opacity: hover === idx ? 1 : 0.62,
+                        opacity: hover === idx ? 1 : 0.72,
                       }}
                       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                      className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-sky-100"
+                      className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-ink-soft"
                     >
                       {p.text}
                     </motion.p>
                   </div>
-                  <span className="flex items-center gap-5 text-[0.78rem] uppercase tracking-[0.16em] text-white/45">
+                  <span className="flex items-center gap-5 text-[0.78rem] uppercase tracking-[0.16em] text-mute">
                     {p.city}
-                    <span className="text-lg text-wheat-400 transition-transform duration-500 group-hover:translate-x-1.5">
+                    <span className="text-lg text-sky-700 transition-transform duration-500 group-hover:translate-x-1.5">
                       →
                     </span>
                   </span>

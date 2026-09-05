@@ -10,8 +10,10 @@ export default function Placeholder({
   text: string;
 }) {
   return (
-    <section className="bg-paper pb-28 pt-44">
-      <div className="shell">
+    <section className="relative overflow-hidden bg-paper-dim pb-28 pt-44">
+      <div className="absolute inset-0 bg-[radial-gradient(72%_90%_at_88%_0%,rgba(255,201,60,0.30),transparent_66%),radial-gradient(58%_80%_at_2%_8%,rgba(42,123,209,0.12),transparent_62%)]" />
+      <div className="grain" />
+      <div className="shell relative">
         <p className="eyebrow text-sky-700">{eyebrow}</p>
         <h1 className="display mt-5 max-w-4xl text-[clamp(2.2rem,5.6vw,4.4rem)] text-ink">
           {title}
