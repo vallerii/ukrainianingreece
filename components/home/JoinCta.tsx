@@ -11,7 +11,7 @@ export default function JoinCta() {
   const y = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
 
   return (
-    <section ref={ref} className="relative overflow-hidden bg-wheat-400">
+    <section id="doluchytysia" ref={ref} className="relative overflow-hidden bg-wheat-400">
       <motion.div
         style={{ y }}
         className="absolute inset-x-0 -top-1/4 h-[150%] bg-[radial-gradient(60%_50%_at_78%_30%,rgba(255,255,255,0.55),transparent_70%)]"

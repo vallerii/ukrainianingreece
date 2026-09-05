@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { nav, site } from "@/lib/site";
 import Image from "next/image";
+import SocialIcon from "@/components/ui/SocialIcon";
 
 export default function Footer() {
   return (
@@ -11,9 +12,23 @@ export default function Footer() {
       <div className="shell py-20">
         <div className="grid gap-14 lg:grid-cols-[1.25fr_2fr]">
           <div>
-            <Link href="/" className="flex items-center gap-3">
-              <span className="relative block h-90 w-90 overflow-hidden rounded-full">
-                 <Image src="/logo.jpg" alt={site.name} width={384} height={384} />
+            <Link href="/" className="flex items-center gap-4">
+              <span className="relative block h-20 w-20 shrink-0 overflow-hidden rounded-full ring-1 ring-white/15">
+                <Image
+                  src="/logo.jpg"
+                  alt={site.name}
+                  width={200}
+                  height={200}
+                  className="h-full w-full object-cover"
+                />
+              </span>
+              <span className="max-w-[13rem]">
+                <span className="wordmark block text-[0.86rem] text-paper">
+                  Об&apos;єднана українська
+                </span>
+                <span className="wordmark block text-[0.86rem] text-sky-100/70">
+                  діаспора в Греції
+                </span>
               </span>
             </Link>
 
@@ -24,14 +39,15 @@ export default function Footer() {
             <div className="mt-8 flex gap-3">
               {site.socials.map((s) => (
                 <a
-                  key={s.short}
+                  key={s.icon}
                   href={s.href}
                   target="_blank"
                   rel="noreferrer"
                   aria-label={s.label}
-                  className="grid h-11 w-11 place-items-center rounded-full border border-white/18 text-[0.72rem] font-bold tracking-wider transition-colors hover:border-wheat-400 hover:text-wheat-400"
+                  title={s.label}
+                  className="grid h-11 w-11 place-items-center rounded-full border border-white/18 text-sky-100/80 transition-colors hover:border-wheat-400 hover:text-wheat-400"
                 >
-                  {s.short}
+                  <SocialIcon name={s.icon} className="h-[1.15rem] w-[1.15rem]" />
                 </a>
               ))}
             </div>

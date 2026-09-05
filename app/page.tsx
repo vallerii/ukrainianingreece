@@ -11,10 +11,12 @@ export default function Home() {
     <>
       <Hero />
       <About />
-      <Projects />
+      {/* Партнери та підтримка — за правкою клієнта перед «Прийдешніми подіями» */}
+      <Partners />
       <Events />
       <News />
-      <Partners />
+      {/* Проєкти-сателіти — за правкою клієнта нижче новин */}
+      <Projects />
       <JoinCta />
     </>
   );

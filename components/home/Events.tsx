@@ -19,9 +19,10 @@ export default function Events() {
         <div>
           {events.map((e, idx) => (
             <Reveal key={e.title} delay={idx * 0.05}>
-              <Link href={e.href} className="group relative block overflow-hidden border-b border-line">
-                <span className="absolute inset-0 z-0 origin-bottom scale-y-0 bg-sky-deep transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100" />
-                <div className="relative z-10 grid items-center gap-4 py-7 md:grid-cols-[8.5rem_1fr_auto] md:gap-10 md:py-9">
+              <Link href={e.href} className="group relative block border-b border-line">
+                {/* заливка виходить за межі контенту — це і дає «повітря» при наведенні */}
+                <span className="absolute -inset-x-5 inset-y-0 z-0 origin-bottom scale-y-0 bg-sky-deep transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100 md:-inset-x-8 xl:-inset-x-10" />
+                <div className="relative z-10 grid items-center gap-4 py-8 md:grid-cols-[8.5rem_1fr_auto] md:gap-10 md:py-10">
                   <div className="flex items-baseline gap-3 md:block">
                     <p className="display text-[2.6rem] leading-none text-ink transition-colors duration-500 group-hover:text-wheat-400 md:text-[3.4rem]">
                       {e.day}
@@ -41,8 +42,11 @@ export default function Events() {
                       {e.place} · {e.time}
                     </p>
                   </div>
-                  <span className="flex items-center gap-2 text-sm font-semibold text-ink transition-all duration-500 group-hover:translate-x-1.5 group-hover:text-wheat-400">
-                    Деталі <span>→</span>
+                  <span className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-ink transition-colors duration-500 group-hover:text-wheat-400">
+                    Деталі
+                    <span className="inline-block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1">
+                      →
+                    </span>
                   </span>
                 </div>
               </Link>

@@ -1,5 +1,64 @@
 @import "tailwindcss";
 
+/* e-Ukraine — офіційна шрифтова гарнітура українського бренду */
+@font-face {
+  font-family: "e-Ukraine Head";
+  src: url("/fonts/e-UkraineHead-Light.woff2") format("woff2");
+  font-weight: 100 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "e-Ukraine Head";
+  src: url("/fonts/e-UkraineHead-Regular.woff2") format("woff2");
+  font-weight: 400 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "e-Ukraine Head";
+  src: url("/fonts/e-UkraineHead-Medium.woff2") format("woff2");
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "e-Ukraine Head";
+  src: url("/fonts/e-UkraineHead-Bold.woff2") format("woff2");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine-Light.woff2") format("woff2");
+  font-weight: 100 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine-Regular.woff2") format("woff2");
+  font-weight: 400 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine-Medium.woff2") format("woff2");
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine-Bold.woff2") format("woff2");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 @theme {
   /* Ukrainian sky */
   --color-sky-deep: #062E5F;
@@ -24,8 +83,8 @@
   --color-paper: #FBF8F1;
   --color-paper-dim: #F2EDE2;
 
-  --font-display: "Unbounded", "Segoe UI", system-ui, sans-serif;
-  --font-sans: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-display: "e-Ukraine Head", "e-Ukraine", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "e-Ukraine", "Segoe UI", system-ui, sans-serif;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -61,15 +120,24 @@
   }
   .display {
     font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 0.95;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.0;
   }
   .eyebrow {
     font-size: 0.75rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 500;
+  }
+
+  /* Логотипний напис — назва організації великими літерами */
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.085em;
+    line-height: 1.35;
   }
   .rule {
     height: 1px;

@@ -6,14 +6,15 @@ export const site = {
   phone: "+30 000 000 000",
   cities: ["Афіни", "Салоніки", "Крит", "Патри"],
   socials: [
-    { label: "Facebook", short: "FB", href: "https://facebook.com" },
-    { label: "Instagram", short: "IG", href: "https://instagram.com" },
-    { label: "YouTube", short: "YT", href: "https://youtube.com" },
-  ],
+    { label: "Facebook", short: "FB", icon: "facebook", href: "https://facebook.com" },
+    { label: "Instagram", short: "IG", icon: "instagram", href: "https://instagram.com" },
+    { label: "YouTube", short: "YT", icon: "youtube", href: "https://youtube.com" },
+  ] as const,
   languages: [
-    { code: "ua", label: "Українська", flag: "🇺🇦" },
-    { code: "en", label: "English", flag: "🇬🇧" },
-  ],
+    { code: "uk", short: "UA", label: "Українська" },
+    { code: "en", short: "EN", label: "English" },
+    { code: "el", short: "GR", label: "Ελληνικά" },
+  ] as const,
 };
 
 export type NavItem = {

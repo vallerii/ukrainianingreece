@@ -5,23 +5,30 @@ import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { nav, site } from "@/lib/site";
 import Image from "next/image";
+import SocialIcon from "@/components/ui/SocialIcon";
 
 function Logo({ solid }: { solid: boolean }) {
   return (
-    <Link href="/" className="group flex items-center gap-3" aria-label={site.name}>
-      <span className="relative block h-12 w-12 overflow-hidden rounded-full ring-1 ring-black/10">
-        <Image src="/logo.jpg" alt={site.name} width={60} height={60} />
+    <Link href="/" className="group flex items-center gap-3.5" aria-label={site.name}>
+      <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-black/10">
+        <Image
+          src="/logo.jpg"
+          alt={site.name}
+          width={140}
+          height={140}
+          className="h-full w-full object-cover"
+        />
       </span>
-      <span className="hidden leading-[1.05] sm:block">
+      <span className="hidden sm:block">
         <span
-          className={`block font-display text-[0.82rem] font-semibold tracking-tight transition-colors ${
+          className={`wordmark block text-[0.82rem] transition-colors lg:text-[0.86rem] xl:text-[0.95rem] ${
             solid ? "text-ink" : "text-white"
           }`}
         >
-          Об'єднана українська
+          Об&apos;єднана українська
         </span>
         <span
-          className={`block font-display text-[0.82rem] font-semibold tracking-tight transition-colors ${
+          className={`wordmark block text-[0.82rem] transition-colors lg:text-[0.86rem] xl:text-[0.95rem] ${
             solid ? "text-mute" : "text-sky-100"
           }`}
         >
@@ -59,39 +66,43 @@ export default function Header() {
           }`}
         >
           <div className="shell flex h-11 items-center justify-end gap-7 text-[0.72rem] text-white/85">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
               {site.socials.map((s) => (
                 <a
-                  key={s.short}
+                  key={s.icon}
                   href={s.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="font-semibold tracking-[0.14em] transition-colors hover:text-wheat-400"
+                  aria-label={s.label}
+                  title={s.label}
+                  className="text-white/85 transition-colors hover:text-wheat-400"
                 >
-                  {s.short}
+                  <SocialIcon name={s.icon} className="h-[1.05rem] w-[1.05rem]" />
                 </a>
               ))}
             </div>
             <span className="h-3.5 w-px bg-white/25" />
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               {site.languages.map((l, i) => (
                 <button
                   key={l.code}
-                  className={`flex items-center gap-1.5 tracking-wide transition-opacity ${
+                  lang={l.code}
+                  aria-label={l.label}
+                  title={l.label}
+                  className={`px-0.5 font-medium uppercase tracking-[0.12em] transition-opacity ${
                     i === 0 ? "opacity-100" : "opacity-55 hover:opacity-100"
                   }`}
                 >
-                  <span className="text-sm leading-none">{l.flag}</span>
-                  <span className="font-semibold uppercase">{l.code}</span>
+                  {l.short}
                 </button>
               ))}
             </div>
             <span className="h-3.5 w-px bg-white/25" />
             <Link
-              href="/pidtrymaty"
-              className="rounded-full bg-wheat-400 px-4 py-1.5 font-bold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-white"
+              href="/#doluchytysia"
+              className="rounded-full bg-wheat-400 px-4 py-1.5 font-medium uppercase tracking-[0.14em] text-ink transition-colors hover:bg-white"
             >
-              Донат
+              Долучитися
             </Link>
           </div>
         </div>
@@ -105,7 +116,7 @@ export default function Header() {
               <div key={item.href} onMouseEnter={() => setOpen(item.label)}>
                 <Link
                   href={item.href}
-                  className={`relative block px-3.5 py-2 text-[0.82rem] font-semibold tracking-tight transition-colors ${
+                  className={`relative block px-3.5 py-2 text-[0.82rem] font-medium tracking-tight transition-colors ${
                     tone ? "text-ink-soft hover:text-ink" : "text-white/90 hover:text-white"
                   }`}
                 >
@@ -126,13 +137,13 @@ export default function Header() {
           <div className="flex items-center gap-4">
             <Link
               href="/pidtrymaty"
-              className={`hidden rounded-full px-5 py-2.5 text-[0.78rem] font-bold uppercase tracking-[0.12em] transition-all lg:inline-block ${
+              className={`hidden rounded-full px-5 py-2.5 text-[0.75rem] font-medium uppercase tracking-[0.14em] transition-all lg:inline-block ${
                 solid
                   ? "bg-ink text-paper hover:bg-sky-700"
                   : "border border-white/35 text-white hover:border-wheat-400 hover:text-wheat-400"
               }`}
             >
-              Долучитися
+              Донат
             </Link>
 
             <button
@@ -248,28 +259,50 @@ export default function Header() {
               ))}
 
               <div className="mt-8 flex items-center justify-between">
-                <div className="flex gap-5 text-sm font-semibold text-ink-soft">
+                <div className="flex gap-5 text-ink-soft">
                   {site.socials.map((s) => (
-                    <a key={s.short} href={s.href} target="_blank" rel="noreferrer">
-                      {s.short}
+                    <a
+                      key={s.icon}
+                      href={s.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={s.label}
+                      className="transition-colors hover:text-sky-700"
+                    >
+                      <SocialIcon name={s.icon} className="h-5 w-5" />
                     </a>
                   ))}
                 </div>
                 <div className="flex gap-3 text-sm">
-                  {site.languages.map((l) => (
-                    <button key={l.code} className="uppercase">
-                      {l.flag} {l.code}
+                  {site.languages.map((l, i) => (
+                    <button
+                      key={l.code}
+                      lang={l.code}
+                      aria-label={l.label}
+                      className={`font-medium uppercase tracking-[0.12em] ${
+                        i === 0 ? "text-ink" : "text-mute"
+                      }`}
+                    >
+                      {l.short}
                     </button>
                   ))}
                 </div>
               </div>
 
               <Link
+                href="/#doluchytysia"
+                onClick={() => setMobile(false)}
+                className="mt-6 block rounded-full border border-ink/20 py-4 text-center text-sm font-medium uppercase tracking-[0.14em] text-ink"
+              >
+                Долучитися
+              </Link>
+
+              <Link
                 href="/pidtrymaty"
                 onClick={() => setMobile(false)}
-                className="mt-6 block rounded-full bg-wheat-400 py-4 text-center text-sm font-bold uppercase tracking-[0.14em] text-ink"
+                className="mt-3 block rounded-full bg-wheat-400 py-4 text-center text-sm font-medium uppercase tracking-[0.14em] text-ink"
               >
-                Підтримати
+                Донат
               </Link>
             </div>
           </motion.div>
