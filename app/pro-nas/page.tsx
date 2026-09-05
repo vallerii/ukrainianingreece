@@ -211,12 +211,6 @@ export default function Page() {
               </Reveal>
             ))}
           </div>
-
-          <Reveal>
-            <p className="mt-8 text-sm text-mute">
-              Імена та фотографії додамо після узгодження з командою.
-            </p>
-          </Reveal>
         </div>
       </section>
 
