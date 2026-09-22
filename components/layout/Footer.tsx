@@ -15,7 +15,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-4">
               <span className="relative block h-20 w-20 shrink-0 overflow-hidden rounded-full ring-1 ring-white/15">
                 <Image
-                  src="/logo.jpg"
+                  src="/logo.png"
                   alt={site.name}
                   width={200}
                   height={200}
