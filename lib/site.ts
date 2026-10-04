@@ -1,4 +1,6 @@
-import { satellites } from "./projects";
+import { satellites, founders, plural } from "./projects";
+
+export { founders };
 
 export const site = {
   name: "Об'єднана українська діаспора в Греції",
@@ -68,13 +70,6 @@ export const projects = satellites.map((p, i) => ({
   logo: p.logo,
 }));
 
-export const founders = [
-  { name: "Спілка українців Греції", city: "Афіни", href: "/pro-nas#zasnovnyky", hue: 210 },
-  { name: "Школа «Трембіта»", city: "Афіни", href: "/pro-nas#zasnovnyky", hue: 44 },
-  { name: "Українська громада Криту", city: "Ханья", href: "/pro-nas#zasnovnyky", hue: 195 },
-  { name: "Культурний центр «Дніпро»", city: "Салоніки", href: "/pro-nas#zasnovnyky", hue: 32 },
-  { name: "Ініціатива «Разом»", city: "Патри", href: "/pro-nas#zasnovnyky", hue: 225 },
-];
 
 
 
@@ -88,7 +83,11 @@ export const partners = [
 ];
 
 export const stats = [
-  { value: "5", label: "організацій-засновників" },
+  // кількість засновників рахується з lib/projects.ts (founder: true)
+  {
+    value: String(founders.length),
+    label: plural(founders.length, ["організація-засновник", "організації-засновники", "організацій-засновників"]),
+  },
   { value: "4", label: "міста присутності" },
   { value: "180+", label: "дітей у суботніх школах" },
   { value: "2022", label: "рік нової хвилі" },

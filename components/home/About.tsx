@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { founders, stats } from "@/lib/site";
+import { foundersPhrase } from "@/lib/projects";
 import Reveal from "@/components/ui/Reveal";
 
 export default function About() {
@@ -93,6 +94,13 @@ export default function About() {
                   }}
                 >
                   <div className="grain" />
+                  {/* логотип засновника, якщо є */}
+                  {active.logo && (
+                    <div className="absolute inset-x-[18%] top-[12%] flex aspect-square items-center justify-center rounded-full bg-white p-[9%] shadow-[0_30px_60px_-30px_rgba(6,46,95,0.6)]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={active.logo.src} alt="" className="max-h-full max-w-full object-contain" />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_45%,rgba(10,20,32,0.72)_100%)]" />
                 </motion.div>
               </AnimatePresence>
@@ -137,7 +145,7 @@ export default function About() {
               </div>
             </div>
             <p className="mt-4 text-sm text-mute">
-              П'ять організацій-засновників у чотирьох містах Греції.
+              {foundersPhrase()} — засновники об’єднання.
             </p>
           </Reveal>
         </div>

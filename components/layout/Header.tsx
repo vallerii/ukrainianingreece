@@ -154,6 +154,19 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-4">
+            {/* Пошук по сайту */}
+            <Link
+              href="/poshuk"
+              aria-label="Пошук по сайту"
+              className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
+                tone ? "text-ink hover:bg-paper-dim hover:text-sky-700" : "text-white hover:text-wheat-400"
+              }`}
+            >
+              <svg aria-hidden viewBox="0 0 24 24" className="h-[1.15rem] w-[1.15rem]" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" strokeLinecap="round" />
+              </svg>
+            </Link>
             <Link
               href="/pidtrymaty"
               className={`hidden rounded-full px-5 py-2.5 text-[0.75rem] font-medium uppercase tracking-[0.14em] transition-all lg:inline-block ${

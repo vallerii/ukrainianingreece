@@ -37,12 +37,15 @@ export type Satellite = {
     socials?: { icon: SocialKey; label: string; href: string }[];
   };
   sections?: Section[];
+  /** Організація-засновник Об’єднання: потрапляє в блок «Засновники» (/pro-nas, головна) і в лічильник */
+  founder?: boolean;
 };
 
 export const satellites: Satellite[] = [
   /* ── «Трембіта» ─────────────────────────────────────────────── */
   {
     slug: "trembita",
+    founder: true,
     title: "Товариство «Трембіта» та суботня школа",
     navLabel: "«Трембіта»",
     note: "Товариство та школа, Афіни",
@@ -146,6 +149,7 @@ export const satellites: Satellite[] = [
   /* ── Спілка «Лелеки» ───────────────────────────────────────── */
   {
     slug: "leleki",
+    founder: true,
     title: "Спілка українців Криту «Лелеки»",
     navLabel: "Спілка «Лелеки»",
     note: "Українська громада Криту",
@@ -298,6 +302,7 @@ export const satellites: Satellite[] = [
   /* ── Далі — проєкти, про які матеріалів ще немає (заглушки) ── */
   {
     slug: "zhuravlynyi-krai",
+    founder: true,
     title: "Асоціація українців Греції «Український Журавлиний Край»",
     navLabel: "«Український Журавлиний Край»",
     note: "Асоціація українців Греції",
@@ -309,6 +314,7 @@ export const satellites: Satellite[] = [
   },
   {
     slug: "uuwg",
+    founder: true,
     title: "Об’єднання українських жінок у Греції",
     navLabel: "Об’єднання українських жінок",
     note: "UUWG",
@@ -371,3 +377,39 @@ export const satelliteNumber = (slug: string) =>
   String(satellites.findIndex((s) => s.slug === slug) + 1).padStart(2, "0");
 
 export const hasContent = (s: Satellite) => !!s.sections?.length;
+
+/* ── Засновники — похідні від satellites (єдине джерело) ───────────
+ * Щоб додати чи прибрати засновника — постав / зніми `founder: true` у проєкті вище.
+ * Блок «Засновники» на /pro-nas, ротація на головній, цифри й тексти оновляться самі. */
+
+const FOUNDER_HUES = [210, 44, 195, 32, 225, 18, 240, 52];
+
+export const founders = satellites
+  .filter((s) => s.founder)
+  .map((s, i) => ({
+    name: s.title,
+    short: s.navLabel,
+    city: s.city,
+    href: `/proyekty/${s.slug}`,
+    hue: FOUNDER_HUES[i % FOUNDER_HUES.length],
+    logo: s.logo,
+  }));
+
+export type Founder = (typeof founders)[number];
+
+/** Українські форми множини: plural(4, ["організація", "організації", "організацій"]) → «організації» */
+export function plural(n: number, [one, few, many]: [string, string, string]) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}
+
+const NUM_F = ["", "Одна", "Дві", "Три", "Чотири", "П’ять", "Шість", "Сім", "Вісім", "Девʼять", "Десять"];
+
+/** «Чотири організації», «П’ять організацій» — для заголовків. */
+export function foundersPhrase(n = founders.length) {
+  const word = NUM_F[n] ?? String(n);
+  return `${word} ${plural(n, ["організація", "організації", "організацій"])}`;
+}

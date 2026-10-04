@@ -62,14 +62,14 @@ export const PAGE_SIZE = 12;
 const IMAGE = `url alt title width height`;
 
 const ARTICLE_FIELDS = `
-  id slug title _firstPublishedAt content
+  id slug title _firstPublishedAt content(markdown: true)
   tags { id title }
   author { name image { ${IMAGE} } }
   image { ${IMAGE} }
 `;
 
 const EVENT_FIELDS = `
-  id slug title description dateStart dateFinish content reportContent
+  id slug title description dateStart dateFinish content(markdown: true) reportContent(markdown: true)
   tag { id title }
   location { latitude longitude }
   image { ${IMAGE} }
@@ -110,6 +110,16 @@ const term = (t: { id: string; title: string }): Term => ({
   slug: slugify(t.title) || t.id,
 });
 
+/**
+ * Тексти в CMS пишуться в Markdown (картинки — `![](url)`); DatoCMS віддає їх готовим HTML
+ * завдяки `content(markdown: true)`. Редактори ставлять один перенос рядка між абзацами,
+ * а Markdown склеює такі рядки в один абзац — тож розбиваємо їх на окремі <p>.
+ */
+function toHtml(html: string | null | undefined) {
+  if (!html) return "";
+  return html.replace(/([^>\n])\n(?=[^\n])/g, "$1</p>\n<p>").replace(/<p>\s*<\/p>/g, "");
+}
+
 const hasText = (html: string | null | undefined) =>
   !!html && html.replace(/<[^>]+>|&nbsp;|\s/g, "").length > 0;
 
@@ -122,7 +132,7 @@ function toArticle(a: RawArticle): Article {
     type: a.tags ? term(a.tags) : null,
     author: a.author,
     image: a.image,
-    html: a.content ?? "",
+    html: toHtml(a.content),
     hue: hueFrom(a.id),
   };
 }
@@ -141,7 +151,7 @@ export function eventStatus(start: string, finish: string | null, now = new Date
 
 function toEvent(e: RawEvent, now = new Date()): CmsEvent {
   const gallery = e.reportGallery ?? [];
-  const reportHtml = e.reportContent ?? "";
+  const reportHtml = toHtml(e.reportContent);
   return {
     id: e.id,
     slug: e.slug,
@@ -152,7 +162,7 @@ function toEvent(e: RawEvent, now = new Date()): CmsEvent {
     tags: (e.tag ?? []).map(term),
     location: e.location,
     image: e.image,
-    html: e.content ?? "",
+    html: toHtml(e.content),
     report: { html: reportHtml, gallery },
     hasReport: hasText(reportHtml) || gallery.length > 0,
     status: eventStatus(e.dateStart, e.dateFinish, now),
@@ -384,3 +394,31 @@ export const statusLabel: Record<EventStatus, string> = {
   ongoing: "Триває зараз",
   past: "Відбулася",
 };
+
+/* ────────────────────────────────────────────────────────────
+ * Пошук (див. lib/search.ts)
+ * ──────────────────────────────────────────────────────────── */
+
+/**
+ * Статті й події, в яких КОЖНЕ слово запиту трапляється хоча б в одному з полів
+ * (заголовок, опис, текст, звіт). Без урахування регістру; слова — вже «обрізані» до основи.
+ */
+export const searchCms = cache(async (terms: string[]) => {
+  if (terms.length === 0) return { articles: [] as Article[], events: [] as CmsEvent[] };
+  const m = (pattern: string) => ({ matches: { pattern, caseSensitive: false } });
+  const af = { AND: terms.map((t) => ({ OR: [{ title: m(t) }, { content: m(t) }] })) };
+  const ef = {
+    AND: terms.map((t) => ({
+      OR: [{ title: m(t) }, { description: m(t) }, { content: m(t) }, { reportContent: m(t) }],
+    })),
+  };
+  const data = await datoRequest<{ a: RawArticle[]; e: RawEvent[] }>(
+    `query Search($af: ArticleModelFilter, $ef: EventModelFilter) {
+      a: allArticles(locale: uk, first: 30, filter: $af, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
+      e: allEvents(locale: uk, first: 30, filter: $ef, orderBy: dateStart_DESC) { ${EVENT_FIELDS} }
+    }`,
+    { af, ef },
+  );
+  const now = new Date();
+  return { articles: data.a.map(toArticle), events: data.e.map((e) => toEvent(e, now)) };
+});

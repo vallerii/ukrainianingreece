@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { site, stats } from "@/lib/site";
+import { stats } from "@/lib/site";
+import { foundersPhrase } from "@/lib/projects";
 import { goals, geography, team, timeline, values } from "@/lib/about";
 import SectionHead from "@/components/ui/SectionHead";
 import Reveal from "@/components/ui/Reveal";
@@ -219,14 +220,14 @@ export default function Page() {
         <div className="shell">
           <SectionHead
             eyebrow="Засновники"
-            title="П’ять організацій, які започаткували об’єднання"
+            title={`${foundersPhrase()}, які започаткували об’єднання`}
             link="/proyekty"
             linkLabel="Проєкти спільноти"
           />
           <Reveal>
             <p className="max-w-2xl pt-10 text-[1.02rem] leading-relaxed text-ink-soft">
-              Кожна з них працює у своєму місті й зі своєю аудиторією. Разом вони покривають
-              {" "}{site.cities.length} міста Греції — від Афін до Криту.
+              Кожна з них працює у своєму місті й зі своєю аудиторією, а разом вони говорять
+              одним голосом від імені української громади Греції.
             </p>
           </Reveal>
           <Founders />
