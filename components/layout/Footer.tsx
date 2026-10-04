@@ -112,7 +112,12 @@ export default function Footer() {
                     {site.email}
                   </a>
                 </li>
-                <li>{site.phone}</li>
+                <li>
+                  <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="link-underline hover:text-paper">
+                    {site.phone}
+                  </a>
+                </li>
+                <li>{site.address}</li>
                 <li>{site.cities.join(" · ")}</li>
               </ul>
             </div>

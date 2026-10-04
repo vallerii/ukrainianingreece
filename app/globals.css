@@ -166,3 +166,51 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* ── Тексти з CMS (WYSIWYG-HTML) ─────────────────────────── */
+@layer components {
+  .rich {
+    font-size: 1.08rem;
+    line-height: 1.75;
+    color: var(--color-ink-soft);
+  }
+  .rich > * + * { margin-top: 1.25em; }
+  .rich h2,
+  .rich h3,
+  .rich h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .rich h2 { font-size: 1.75rem; margin-top: 2em; }
+  .rich h3 { font-size: 1.35rem; margin-top: 1.8em; }
+  .rich h4 { font-size: 1.1rem; margin-top: 1.6em; font-weight: 500; }
+  .rich strong, .rich b { color: var(--color-ink); font-weight: 600; }
+  .rich a {
+    color: var(--color-sky-700);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .rich a:hover { color: var(--color-ink); }
+  .rich ul, .rich ol { padding-left: 1.3em; }
+  .rich ul { list-style: disc; }
+  .rich ol { list-style: decimal; }
+  .rich li + li { margin-top: 0.45em; }
+  .rich li::marker { color: var(--color-sky-700); }
+  .rich blockquote {
+    border-left: 2px solid var(--color-wheat-400);
+    padding-left: 1.25em;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    line-height: 1.45;
+    color: var(--color-ink);
+  }
+  .rich img { width: 100%; height: auto; }
+  .rich hr { border: 0; height: 1px; background: var(--color-line); margin-block: 2.5em; }
+  .rich table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  .rich th, .rich td { border-bottom: 1px solid var(--color-line); padding: 0.6em 0.5em; text-align: left; }
+  .rich > :first-child { margin-top: 0; }
+}

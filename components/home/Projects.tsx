@@ -43,19 +43,38 @@ export default function Projects() {
                 style={{ x: sx, y: sy }}
                 className="pointer-events-none absolute left-0 top-0 z-20 hidden lg:block"
               >
-                <div
-                  className="relative -ml-[11rem] -mt-[7rem] h-[14rem] w-[22rem] overflow-hidden"
-                  style={{
-                    background: `linear-gradient(140deg, hsl(${
-                      206 + hover * 22
-                    } 64% 48%), hsl(${44 - hover * 4} 88% 56%))`,
-                  }}
-                >
-                  <div className="grain" />
-                  <span className="absolute bottom-4 left-5 font-display text-5xl font-semibold text-white/85">
-                    {projects[hover].n}
-                  </span>
-                </div>
+                {projects[hover].logo ? (
+                  // є логотип — показуємо його на світлій (або фірмовій темній) підкладці
+                  <div
+                    className={`relative -ml-[11rem] -mt-[7rem] flex h-[14rem] w-[22rem] items-center justify-center overflow-hidden p-8 shadow-[0_20px_60px_-25px_rgba(6,46,95,0.45)] ${
+                      projects[hover].logo!.dark ? "bg-[#0B5394]" : "bg-white"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={projects[hover].logo!.src}
+                      alt=""
+                      className="max-h-full max-w-full object-contain"
+                    />
+                    <span className="absolute bottom-3 right-4 font-display text-sm text-mute">
+                      {projects[hover].n}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className="relative -ml-[11rem] -mt-[7rem] h-[14rem] w-[22rem] overflow-hidden"
+                    style={{
+                      background: `linear-gradient(140deg, hsl(${
+                        206 + hover * 22
+                      } 64% 48%), hsl(${44 - hover * 4} 88% 56%))`,
+                    }}
+                  >
+                    <div className="grain" />
+                    <span className="absolute bottom-4 left-5 font-display text-5xl font-semibold text-white/85">
+                      {projects[hover].n}
+                    </span>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

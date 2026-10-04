@@ -114,7 +114,9 @@ export default function Header() {
               ))}
             </div>
             <span className={`h-3.5 w-px ${overHero ? "bg-white/25" : "bg-line"}`} />
-            +30 000 000 000
+            <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="transition-opacity hover:opacity-75">
+              {site.phone}
+            </a>
             {/* <Link
               href="/#doluchytysia"
               className="rounded-full bg-wheat-400 px-4 py-1.5 font-medium uppercase tracking-[0.14em] text-ink transition-colors hover:bg-white"
