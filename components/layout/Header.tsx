@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import DonateLink from "@/components/donate/DonateLink";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { usePathname } from "next/navigation";
-import { nav, site } from "@/lib/site";
+import { site, type NavItem } from "@/lib/site";
 import Image from "next/image";
 import SocialIcon from "@/components/ui/SocialIcon";
 
@@ -40,7 +41,8 @@ function Logo({ solid }: { solid: boolean }) {
   );
 }
 
-export default function Header() {
+/** nav приходить з layout: пункти «Проєкти» — з DatoCMS */
+export default function Header({ nav }: { nav: NavItem[] }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
@@ -167,8 +169,7 @@ export default function Header() {
                 <path d="m20 20-3.5-3.5" strokeLinecap="round" />
               </svg>
             </Link>
-            <Link
-              href="/pidtrymaty"
+            <DonateLink
               className={`hidden rounded-full px-5 py-2.5 text-[0.75rem] font-medium uppercase tracking-[0.14em] transition-all lg:inline-block ${
                 solid
                   ? "bg-ink text-paper hover:bg-sky-700"
@@ -176,7 +177,7 @@ export default function Header() {
               }`}
             >
               Донат
-            </Link>
+            </DonateLink>
 
             <button
               onClick={() => setMobile((v) => !v)}
@@ -329,13 +330,12 @@ export default function Header() {
                 Долучитися
               </Link> */}
 
-              <Link
-                href="/pidtrymaty"
+              <DonateLink
                 onClick={() => setMobile(false)}
                 className="mt-3 block rounded-full bg-wheat-400 py-4 text-center text-sm font-medium uppercase tracking-[0.14em] text-ink"
               >
                 Донат
-              </Link>
+              </DonateLink>
             </div>
           </motion.div>
         )}

@@ -115,7 +115,7 @@ const term = (t: { id: string; title: string }): Term => ({
  * завдяки `content(markdown: true)`. Редактори ставлять один перенос рядка між абзацами,
  * а Markdown склеює такі рядки в один абзац — тож розбиваємо їх на окремі <p>.
  */
-function toHtml(html: string | null | undefined) {
+export function toHtml(html: string | null | undefined) {
   if (!html) return "";
   return html.replace(/([^>\n])\n(?=[^\n])/g, "$1</p>\n<p>").replace(/<p>\s*<\/p>/g, "");
 }
@@ -422,3 +422,56 @@ export const searchCms = cache(async (terms: string[]) => {
   const now = new Date();
   return { articles: data.a.map(toArticle), events: data.e.map((e) => toEvent(e, now)) };
 });
+
+/** Статті, де в заголовку чи тексті трапляється ХОЧА Б ОДНЕ з ключових слів (для тем «Корисної інформації»). */
+export const getArticlesByKeywords = cache(async (keywords: string[], first = 50) => {
+  if (keywords.length === 0) return [] as Article[];
+  const m = (pattern: string) => ({ matches: { pattern, caseSensitive: false } });
+  const filter = { OR: keywords.flatMap((k) => [{ title: m(k) }, { content: m(k) }]) };
+  const data = await datoRequest<{ items: RawArticle[] }>(
+    `query ByKeywords($first: IntType, $filter: ArticleModelFilter) {
+      items: allArticles(locale: uk, first: $first, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
+    }`,
+    { first, filter },
+  );
+  return data.items.map(toArticle);
+});
+
+/* ────────────────────────────────────────────────────────────
+ * Фінансові звіти (модель financial_report)
+ * ──────────────────────────────────────────────────────────── */
+
+export type FinancialReport = {
+  id: string;
+  title: string;
+  year: number;
+  html: string;
+  income: number | null;
+  expenses: number | null;
+  file: { url: string; filename: string; size: number } | null;
+};
+
+/**
+ * Опубліковані фінансові звіти, від нових до старих.
+ * Якщо моделі ще немає в DatoCMS або сталася помилка — повертаємо порожній список,
+ * і посилання «Звіти про використання коштів» просто не показується.
+ */
+export const getFinancialReports = cache(async (): Promise<FinancialReport[]> => {
+  try {
+    const data = await datoRequest<{
+      items: (Omit<FinancialReport, "html"> & { summary: string | null })[];
+    }>(
+      `query FinancialReports {
+        items: allFinancialReports(first: 100, orderBy: year_DESC) {
+          id title year summary(markdown: true) income expenses
+          file { url filename size }
+        }
+      }`,
+    );
+    return data.items.map(({ summary, ...r }) => ({ ...r, html: toHtml(summary) }));
+  } catch {
+    return [];
+  }
+});
+
+export const FINANCIAL_REPORTS_HREF = "/finansovi-zvity";

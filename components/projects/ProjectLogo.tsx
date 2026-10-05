@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { Satellite } from "@/lib/projects";
+import type { OrgLogo } from "@/lib/organizations";
 
 /** Логотип організації на підкладці (світлій або фірмовій темній). */
 export default function ProjectLogo({
@@ -7,7 +7,7 @@ export default function ProjectLogo({
   title,
   className = "",
 }: {
-  logo: NonNullable<Satellite["logo"]>;
+  logo: OrgLogo;
   title: string;
   className?: string;
 }) {

@@ -3,11 +3,11 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
-import { projects } from "@/lib/site";
+import type { ProjectCard } from "@/lib/organizations";
 import SectionHead from "@/components/ui/SectionHead";
 import Reveal from "@/components/ui/Reveal";
 
-export default function Projects() {
+export default function Projects({ projects }: { projects: ProjectCard[] }) {
   const [hover, setHover] = useState<number | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);

@@ -1,9 +1,21 @@
 /** Поле пошуку. Звичайна GET-форма → /poshuk?q=… (працює і без JavaScript). */
-export default function SearchForm({ defaultValue = "", autoFocus = false }: { defaultValue?: string; autoFocus?: boolean }) {
+export default function SearchForm({
+  defaultValue = "",
+  autoFocus = false,
+  action = "/poshuk",
+  placeholder = "Школа, документи, Крит, волонтерство…",
+  label = "Пошук по сайту",
+}: {
+  defaultValue?: string;
+  autoFocus?: boolean;
+  action?: string;
+  placeholder?: string;
+  label?: string;
+}) {
   return (
-    <form action="/poshuk" method="get" role="search" className="group relative mt-10 max-w-3xl">
+    <form action={action} method="get" role="search" className="group relative mt-10 max-w-3xl">
       <label htmlFor="q" className="sr-only">
-        Пошук по сайту
+        {label}
       </label>
       <svg
         aria-hidden
@@ -23,7 +35,7 @@ export default function SearchForm({ defaultValue = "", autoFocus = false }: { d
         defaultValue={defaultValue}
         autoFocus={autoFocus}
         autoComplete="off"
-        placeholder="Школа, документи, Крит, волонтерство…"
+        placeholder={placeholder}
         className="w-full border-0 border-b-2 border-ink/20 bg-transparent py-4 pl-10 pr-28 font-display text-[clamp(1.3rem,2.6vw,2rem)] text-ink placeholder:text-mute/60 focus:border-sky-700 focus:outline-none"
       />
       <button

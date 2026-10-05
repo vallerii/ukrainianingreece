@@ -3,19 +3,25 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { founders, stats } from "@/lib/site";
 import { foundersPhrase } from "@/lib/projects";
+import type { Founder } from "@/lib/organizations";
 import Reveal from "@/components/ui/Reveal";
 
-export default function About() {
+export default function About({
+  founders,
+  stats,
+}: {
+  founders: Founder[];
+  stats: { value: string; label: string }[];
+}) {
   const [i, setI] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setI((v) => (v + 1) % founders.length), 5200);
+    const t = setInterval(() => setI((v) => (v + 1) % Math.max(1, founders.length)), 5200);
     return () => clearInterval(t);
   }, []);
 
-  const active = founders[i];
+  const active = founders[i] ?? founders[0];
 
   return (
     <section id="pro-nas" className="relative bg-paper py-24 md:py-32">
@@ -77,6 +83,7 @@ export default function About() {
           </div>
 
           {/* rotating founders */}
+          {active && (
           <Reveal delay={0.12} className="lg:sticky lg:top-28 lg:self-start">
             <div className="relative aspect-[4/5] w-full overflow-hidden bg-paper-dim">
               <AnimatePresence mode="sync">
@@ -145,9 +152,10 @@ export default function About() {
               </div>
             </div>
             <p className="mt-4 text-sm text-mute">
-              {foundersPhrase()} — засновники об’єднання.
+              {foundersPhrase(founders.length)} — засновники об’єднання.
             </p>
           </Reveal>
+          )}
         </div>
 
         {/* stats */}

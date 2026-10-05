@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { stats } from "@/lib/site";
+import FormLink from "@/components/forms/FormLink";
+import { buildStats } from "@/lib/site";
+import { getOrganizations, toFounders } from "@/lib/organizations";
+
+export const revalidate = 60;
 import { foundersPhrase } from "@/lib/projects";
 import { goals, geography, team, timeline, values } from "@/lib/about";
 import SectionHead from "@/components/ui/SectionHead";
@@ -13,7 +17,9 @@ export const metadata = {
     "Хто ми є, наші цілі, історія, географія, команда та організації-засновники Об’єднаної української діаспори в Греції.",
 };
 
-export default function Page() {
+export default async function Page() {
+  const founders = toFounders(await getOrganizations());
+  const stats = buildStats(founders.length);
   return (
     <>
       {/* ── Шапка сторінки ─────────────────────────────── */}
@@ -220,7 +226,7 @@ export default function Page() {
         <div className="shell">
           <SectionHead
             eyebrow="Засновники"
-            title={`${foundersPhrase()}, які започаткували об’єднання`}
+            title={`${foundersPhrase(founders.length)}, які започаткували об’єднання`}
             link="/proyekty"
             linkLabel="Проєкти спільноти"
           />
@@ -230,7 +236,7 @@ export default function Page() {
               одним голосом від імені української громади Греції.
             </p>
           </Reveal>
-          <Founders />
+          <Founders founders={founders} />
         </div>
       </section>
 
@@ -245,12 +251,12 @@ export default function Page() {
                 Ваша організація теж може стати частиною мережі.
               </h2>
             </div>
-            <Link
-              href="/kontakty"
+            <FormLink
+              kind="organization"
               className="rounded-full bg-ink px-8 py-4 text-sm font-medium uppercase tracking-[0.12em] text-paper transition-colors hover:bg-sky-700"
             >
-              Контакти
-            </Link>
+              Долучити організацію
+            </FormLink>
           </div>
         </div>
       </section>

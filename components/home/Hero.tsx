@@ -35,10 +35,12 @@ function Wheat({
   const stalks = Array.from({ length: count }, (_, i) => {
     const r = rnd(seed + i);
     const r2 = rnd(seed + i + 99);
-    const x = (i / count) * 1440 + (r - 0.5) * 34;
-    const h = height * (0.68 + r2 * 0.5);
-    const lean = (r - 0.5) * 26;
-    return { x, h, lean, key: i, delay: r2 * 4 };
+    // округлюємо: інакше сервер і браузер дають різні останні знаки дробу → помилка гідратації
+    const round = (n: number) => Math.round(n * 100) / 100;
+    const x = round((i / count) * 1440 + (r - 0.5) * 34);
+    const h = round(height * (0.68 + r2 * 0.5));
+    const lean = round((r - 0.5) * 26);
+    return { x, h, lean, key: i, delay: round(r2 * 4) };
   });
 
   return (
@@ -51,21 +53,22 @@ function Wheat({
       {stalks.map((s) => (
         <g key={s.key} opacity={opacity}>
           <path
-            d={`M ${s.x} 320 C ${s.x} ${320 - s.h * 0.5}, ${s.x + s.lean * 0.4} ${
-              320 - s.h * 0.7
-            }, ${s.x + s.lean} ${320 - s.h}`}
+            d={`M ${s.x} 320 C ${s.x} ${(320 - s.h * 0.5).toFixed(2)}, ${(s.x + s.lean * 0.4).toFixed(2)} ${(
+              320 -
+              s.h * 0.7
+            ).toFixed(2)}, ${(s.x + s.lean).toFixed(2)} ${(320 - s.h).toFixed(2)}`}
             stroke={color}
             strokeWidth={2.4}
             fill="none"
             strokeLinecap="round"
           />
           <ellipse
-            cx={s.x + s.lean}
-            cy={320 - s.h - 6}
+            cx={+(s.x + s.lean).toFixed(2)}
+            cy={+(320 - s.h - 6).toFixed(2)}
             rx={5.2}
             ry={13}
             fill={color}
-            transform={`rotate(${s.lean * 0.6} ${s.x + s.lean} ${320 - s.h - 6})`}
+            transform={`rotate(${(s.lean * 0.6).toFixed(2)} ${(s.x + s.lean).toFixed(2)} ${(320 - s.h - 6).toFixed(2)})`}
           />
         </g>
       ))}

@@ -1,6 +1,4 @@
-import { satellites, founders, plural } from "./projects";
-
-export { founders };
+import { plural } from "./projects";
 
 export const site = {
   name: "Об'єднана українська діаспора в Греції",
@@ -53,22 +51,13 @@ export const nav: NavItem[] = [
   {
     label: "Проєкти",
     href: "/proyekty",
-    // пункти меню — з lib/projects.ts (єдине джерело для проєктів-сателітів)
-    children: satellites.map((p) => ({ label: p.navLabel, href: `/proyekty/${p.slug}`, note: p.note })),
+    // пункти меню підставляються з DatoCMS у buildNav()
+    children: [],
   },
   { label: "Корисна інформація", href: "/korysno" },
   { label: "Контакти", href: "/kontakty" },
 ];
 
-/** Проєкти-сателіти для блоку на головній (дані — у lib/projects.ts). */
-export const projects = satellites.map((p, i) => ({
-  n: String(i + 1).padStart(2, "0"),
-  title: p.title,
-  href: `/proyekty/${p.slug}`,
-  city: p.city,
-  text: p.summary,
-  logo: p.logo,
-}));
 
 
 
@@ -82,11 +71,20 @@ export const partners = [
   "Українська Всесвітня Координаційна Рада",
 ];
 
-export const stats = [
-  // кількість засновників рахується з lib/projects.ts (founder: true)
+/** Меню з пунктами «Проєкти» з DatoCMS. */
+export function buildNav(projects: { navLabel: string; note: string; slug: string }[]): NavItem[] {
+  return nav.map((item) =>
+    item.href === "/proyekty"
+      ? { ...item, children: projects.map((p) => ({ label: p.navLabel, href: `/proyekty/${p.slug}`, note: p.note })) }
+      : item,
+  );
+}
+
+/** Цифри для «Про нас». Кількість засновників — з DatoCMS (Founder of the union). */
+export const buildStats = (foundersCount: number) => [
   {
-    value: String(founders.length),
-    label: plural(founders.length, ["організація-засновник", "організації-засновники", "організацій-засновників"]),
+    value: String(foundersCount),
+    label: plural(foundersCount, ["організація-засновник", "організації-засновники", "організацій-засновників"]),
   },
   { value: "4", label: "міста присутності" },
   { value: "180+", label: "дітей у суботніх школах" },

@@ -1,4 +1,8 @@
 /**
+ * ⚠ Тепер проєкти живуть у DatoCMS (модель «organization»), сайт читає їх через lib/organizations.ts.
+ * Цей файл — вихідні дані для scripts/organizations-seed.json і запасний варіант,
+ * поки в CMS немає опублікованих записів. Редагуйте організації в DatoCMS, а не тут.
+ *
  * Проєкти-сателіти — організації, школи та ініціативи під дахом Об’єднання.
  * Єдине джерело для: блоку «Проєкти-сателіти» на головній, сторінки /proyekty,
  * сторінок /proyekty/[slug], меню «Проєкти» в шапці та підвалі.
@@ -378,25 +382,6 @@ export const satelliteNumber = (slug: string) =>
 
 export const hasContent = (s: Satellite) => !!s.sections?.length;
 
-/* ── Засновники — похідні від satellites (єдине джерело) ───────────
- * Щоб додати чи прибрати засновника — постав / зніми `founder: true` у проєкті вище.
- * Блок «Засновники» на /pro-nas, ротація на головній, цифри й тексти оновляться самі. */
-
-const FOUNDER_HUES = [210, 44, 195, 32, 225, 18, 240, 52];
-
-export const founders = satellites
-  .filter((s) => s.founder)
-  .map((s, i) => ({
-    name: s.title,
-    short: s.navLabel,
-    city: s.city,
-    href: `/proyekty/${s.slug}`,
-    hue: FOUNDER_HUES[i % FOUNDER_HUES.length],
-    logo: s.logo,
-  }));
-
-export type Founder = (typeof founders)[number];
-
 /** Українські форми множини: plural(4, ["організація", "організації", "організацій"]) → «організації» */
 export function plural(n: number, [one, few, many]: [string, string, string]) {
   const m10 = n % 10;
@@ -409,7 +394,7 @@ export function plural(n: number, [one, few, many]: [string, string, string]) {
 const NUM_F = ["", "Одна", "Дві", "Три", "Чотири", "П’ять", "Шість", "Сім", "Вісім", "Девʼять", "Десять"];
 
 /** «Чотири організації», «П’ять організацій» — для заголовків. */
-export function foundersPhrase(n = founders.length) {
+export function foundersPhrase(n: number) {
   const word = NUM_F[n] ?? String(n);
   return `${word} ${plural(n, ["організація", "організації", "організацій"])}`;
 }

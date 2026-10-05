@@ -2,7 +2,7 @@
  * Загальний пошук по сайту (варіант 1 — без зовнішніх сервісів).
  *
  *  • Статті й події — запит до DatoCMS (фільтр `matches`, див. searchCms у lib/cms.ts).
- *  • Проєкти, «Про нас» та інші сторінки, тексти яких живуть у коді, — шукаємо тут же.
+ *  • Проєкти (організації з DatoCMS), «Про нас» та інші сторінки з коду — шукаємо тут же.
  *
  * Обмеження: це пошук за входженням рядка. Щоб «школа» знаходила «школи», слова запиту
  * обрізаються до основи (див. stem). Опечатки не виправляються.
@@ -10,9 +10,10 @@
  * не змінюючи сторінку /poshuk.
  */
 import { searchCms, type Article, type CmsEvent } from "./cms";
-import { satellites, satelliteNumber } from "./projects";
+import { getOrganizations, type Org } from "./organizations";
 import { goals, geography, team, timeline, values } from "./about";
 import { site } from "./site";
+import { topics } from "./korysno";
 
 export const MIN_QUERY = 2;
 
@@ -89,26 +90,18 @@ export function snippet(text: string, terms: string[], size = 200) {
 
 type StaticDoc = { title: string; href: string; section: string; text: string };
 
-const blocksText = (s: (typeof satellites)[number]) =>
-  [
-    s.subtitle,
-    s.summary,
-    s.city,
-    ...(s.facts ?? []).map((f) => `${f.label}: ${f.value}`),
-    ...(s.sections ?? []).flatMap((sec) => [
-      sec.title,
-      ...sec.blocks.flatMap((b) => ("p" in b ? [b.p] : b.list)),
-    ]),
-  ]
+const orgText = (o: Org) =>
+  [o.subtitle, o.summary, o.city, ...o.facts.map((f) => `${f.label}: ${f.value}`), stripHtml(o.html)]
     .filter(Boolean)
     .join(" ");
 
-const staticDocs: StaticDoc[] = [
-  ...satellites.map((s) => ({
-    title: s.title,
-    href: `/proyekty/${s.slug}`,
-    section: `Проєкт ${satelliteNumber(s.slug)} · ${s.city}`,
-    text: blocksText(s),
+// функція, а не константа: lib/korysno ↔ lib/search імпортують одне одного
+const staticDocs = (orgs: Org[]): StaticDoc[] => [
+  ...orgs.map((o) => ({
+    title: o.title,
+    href: `/proyekty/${o.slug}`,
+    section: `Проєкт ${o.n} · ${o.city}`,
+    text: orgText(o),
   })),
   {
     title: "Хто ми є",
@@ -145,9 +138,15 @@ const staticDocs: StaticDoc[] = [
   {
     title: "Корисна інформація",
     href: "/korysno",
-    section: "Сторінка",
-    text: "Довідник: документи, освіта, медицина, робота, житло, легалізація.",
+    section: "Довідник",
+    text: "Довідник: " + topics.map((t) => t.title).join(", "),
   },
+  ...topics.map((t) => ({
+    title: t.title,
+    href: `/korysno/${t.slug}`,
+    section: "Корисна інформація",
+    text: `${t.lead} ${t.links.map((l) => l.label).join(". ")}`,
+  })),
   {
     title: "Контакти",
     href: "/kontakty",
@@ -162,8 +161,8 @@ const staticDocs: StaticDoc[] = [
   },
 ];
 
-function searchStatic(terms: string[]) {
-  return staticDocs
+function searchStatic(terms: string[], orgs: Org[]) {
+  return staticDocs(orgs)
     .map((d) => {
       const t = norm(d.title);
       const body = norm(d.text);
@@ -193,10 +192,8 @@ export async function searchSite(q: string): Promise<SearchResults> {
   const terms = parseQuery(q);
   if (!terms.length) return { terms, articles: [], events: [], projects: [], pages: [], total: 0 };
 
-  const [cms, docs] = await Promise.all([
-    searchCms(terms),
-    Promise.resolve(searchStatic(terms)),
-  ]);
+  const [cms, orgs] = await Promise.all([searchCms(terms), getOrganizations()]);
+  const docs = searchStatic(terms, orgs);
   // DatoCMS шукає входження будь-де в слові — лишаємо тільки збіги з початку слова
   const articles = cms.articles.filter((a) => matchesAll(`${a.title} ${stripHtml(a.html)}`, terms));
   const events = cms.events.filter((e) =>

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import DonateLink from "@/components/donate/DonateLink";
 import { motion } from "motion/react";
-import { nav, site } from "@/lib/site";
+import { site, type NavItem } from "@/lib/site";
 import Image from "next/image";
 import SocialIcon from "@/components/ui/SocialIcon";
 
-export default function Footer() {
+export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; reportsHref?: string | null }) {
   return (
     <footer className="relative overflow-hidden bg-ink text-paper">
       <div className="shell py-20">
@@ -91,14 +92,21 @@ export default function Footer() {
                   { label: "Новини", href: "/novyny" },
                   { label: "Прийдешні події", href: "/podiyi" },
                   { label: "Звіти", href: "/podiyi/zvity" },
+                  ...(reportsHref ? [{ label: "Звіти про кошти", href: reportsHref }] : []),
                   { label: "Корисна інформація", href: "/korysno" },
                   { label: "Контакти", href: "/kontakty" },
                   { label: "Підтримати", href: "/pidtrymaty" },
                 ].map((c) => (
                   <li key={c.href}>
-                    <Link href={c.href} className="text-[0.92rem] text-sky-100/70 transition-colors hover:text-paper">
-                      {c.label}
-                    </Link>
+                    {c.href === "/pidtrymaty" ? (
+                      <DonateLink className="text-[0.92rem] text-sky-100/70 transition-colors hover:text-paper">
+                        {c.label}
+                      </DonateLink>
+                    ) : (
+                      <Link href={c.href} className="text-[0.92rem] text-sky-100/70 transition-colors hover:text-paper">
+                        {c.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -161,9 +169,7 @@ export default function Footer() {
             <Link href="/kontakty" className="hover:text-paper">
               Для медіа
             </Link>
-            <Link href="/pidtrymaty" className="text-wheat-400 hover:text-paper">
-              Підтримати
-            </Link>
+            <DonateLink className="text-wheat-400 hover:text-paper">Підтримати</DonateLink>
           </div>
         </div>
       </div>

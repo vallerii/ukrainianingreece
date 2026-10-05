@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import DonateLink from "@/components/donate/DonateLink";
+import FormLink from "@/components/forms/FormLink";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import Reveal from "@/components/ui/Reveal";
@@ -41,10 +43,10 @@ export default function JoinCta() {
             <div className="flex flex-col gap-4">
               {[
                 { label: "Підтримати донатом", href: "/pidtrymaty", primary: true },
-                { label: "Стати волонтером", href: "/kontakty" },
-                { label: "Долучити організацію", href: "/kontakty" },
+                { label: "Стати волонтером", href: "#volunteer" },
+                { label: "Долучити організацію", href: "#organization" },
               ].map((b) => (
-                <Link
+                <ButtonOrDonate
                   key={b.label}
                   href={b.href}
                   className={`group flex items-center justify-between gap-6 border-b border-ink/25 py-4 text-[1.05rem] font-semibold tracking-tight transition-colors ${
@@ -55,12 +57,28 @@ export default function JoinCta() {
                   <span className="text-xl transition-transform duration-300 group-hover:translate-x-1.5">
                     →
                   </span>
-                </Link>
+                </ButtonOrDonate>
               ))}
             </div>
           </Reveal>
         </div>
       </div>
     </section>
+  );
+}
+
+/** Усі три кнопки відкривають попапи: донат, форма волонтера, форма організації. */
+function ButtonOrDonate({ href, className, children }: { href: string; className: string; children: React.ReactNode }) {
+  if (href === "/pidtrymaty") return <DonateLink className={className}>{children}</DonateLink>;
+  if (href === "#volunteer" || href === "#organization")
+    return (
+      <FormLink kind={href.slice(1) as "volunteer" | "organization"} className={className}>
+        {children}
+      </FormLink>
+    );
+  return (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
   );
 }

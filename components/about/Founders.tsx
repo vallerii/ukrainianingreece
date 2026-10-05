@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { founders } from "@/lib/site";
+import type { Founder } from "@/lib/organizations";
 import Reveal from "@/components/ui/Reveal";
 
-// Кількість колонок підлаштовується під кількість засновників (дані — lib/projects.ts)
+// Кількість колонок підлаштовується під кількість засновників (дані — DatoCMS)
 const COLS: Record<number, string> = {
   1: "lg:grid-cols-1",
   2: "lg:grid-cols-2",
@@ -14,7 +14,7 @@ const COLS: Record<number, string> = {
   4: "lg:grid-cols-4",
 };
 
-export default function Founders() {
+export default function Founders({ founders }: { founders: Founder[] }) {
   return (
     <div className={`mt-14 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 ${COLS[founders.length] ?? "lg:grid-cols-5"}`}>
       {founders.map((f, idx) => (

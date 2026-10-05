@@ -1,47 +1,38 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSatellite, hasContent, satelliteNumber, satellites, type Block } from "@/lib/projects";
+import { getOrganization, getOrganizations } from "@/lib/organizations";
 import PageHead from "@/components/cms/PageHead";
 import ProjectLogo from "@/components/projects/ProjectLogo";
 import SocialIcon from "@/components/ui/SocialIcon";
+import RichText from "@/components/cms/RichText";
 import Reveal from "@/components/ui/Reveal";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export const dynamicParams = false;
+export const revalidate = 60;
 
-export function generateStaticParams() {
-  return satellites.map((s) => ({ slug: s.slug }));
+export async function generateStaticParams() {
+  return (await getOrganizations()).map((o) => ({ slug: o.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const p = getSatellite((await params).slug);
+  const p = await getOrganization((await params).slug);
   if (!p) return {};
   return { title: p.title, description: p.summary };
 }
 
-function renderBlock(b: Block, i: number) {
-  if ("p" in b) return <p key={i}>{b.p}</p>;
-  return (
-    <ul key={i}>
-      {b.list.map((li) => (
-        <li key={li}>{li}</li>
-      ))}
-    </ul>
-  );
-}
-
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  const p = getSatellite(slug);
+  const orgs = await getOrganizations();
+  const p = orgs.find((o) => o.slug === slug);
   if (!p) notFound();
 
-  const full = hasContent(p);
-  const idx = satellites.findIndex((s) => s.slug === p.slug);
-  const next = satellites[(idx + 1) % satellites.length];
+  const full = p.html.trim().length > 0;
+  const idx = orgs.findIndex((o) => o.slug === p.slug);
+  const next = orgs[(idx + 1) % orgs.length];
   const c = p.contacts;
-  const hasContacts = !!(c && (c.phone || c.email || c.address || c.socials?.length));
+  const hasContacts = !!(c && (c.phone || c.email || c.address || c.website || c.socials?.length));
 
   return (
     <>
@@ -53,7 +44,7 @@ export default async function Page({ params }: Props) {
             </Link>
             <span className="h-px w-8 bg-line" />
             <span>
-              {satelliteNumber(p.slug)} · {p.city}
+              {p.n} · {p.city}
             </span>
           </span>
         }
@@ -66,18 +57,9 @@ export default async function Page({ params }: Props) {
           {/* Основний текст */}
           <div className="min-w-0">
             {full ? (
-              <div className="max-w-[44rem] space-y-14">
-                {p.sections!.map((s, i) => (
-                  <Reveal key={i}>
-                    <section>
-                      {s.title && (
-                        <h2 className="display mb-6 text-[clamp(1.5rem,2.6vw,2.1rem)] text-ink">{s.title}</h2>
-                      )}
-                      <div className="rich">{s.blocks.map(renderBlock)}</div>
-                    </section>
-                  </Reveal>
-                ))}
-              </div>
+              <Reveal>
+                <RichText html={p.html} className="max-w-[44rem]" />
+              </Reveal>
             ) : (
               <div className="max-w-[44rem]">
                 <p className="text-lg leading-relaxed text-ink-soft">{p.summary}</p>
@@ -130,6 +112,18 @@ export default async function Page({ params }: Props) {
                     </li>
                   )}
                   {c!.address && <li className="leading-relaxed text-ink-soft">{c!.address}</li>}
+                  {c!.website && (
+                    <li>
+                      <a
+                        href={c!.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link-underline break-all text-ink"
+                      >
+                        {c!.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+                      </a>
+                    </li>
+                  )}
                   {c!.socials?.map((s) => (
                     <li key={s.href}>
                       <a
@@ -158,7 +152,7 @@ export default async function Page({ params }: Props) {
       <Link href={`/proyekty/${next.slug}`} className="group block bg-paper-dim">
         <div className="shell flex flex-wrap items-end justify-between gap-6 py-16 md:py-20">
           <div>
-            <p className="eyebrow text-sky-700">Наступний проєкт · {satelliteNumber(next.slug)}</p>
+            <p className="eyebrow text-sky-700">Наступний проєкт · {next.n}</p>
             <p className="display mt-4 max-w-3xl text-[clamp(1.6rem,3.4vw,2.8rem)] text-ink transition-colors group-hover:text-sky-700">
               {next.title}
             </p>

@@ -9,3 +9,6 @@ npm-debug.log*
 next-env.d.ts
 .vercel
 tsconfig.tsbuildinfo
+
+# кеш завантажених логотипів (scripts/datocms-seed-organizations.mjs)
+scripts/.datocms-uploads.json
