@@ -141,7 +141,7 @@ export default async function Page() {
             {goals.map((g, idx) => (
               <Reveal key={g.n} delay={idx * 0.06}>
                 <div className="grid grid-cols-[3rem_1fr] gap-4 border-b border-line py-8 md:gap-6 md:py-10">
-                  <span className="font-display text-sm text-mute/70">{g.n}</span>
+                  <span className="font-display text-sm text-mute">{g.n}</span>
                   <div>
                     <h3 className="display text-[clamp(1.4rem,2.6vw,2rem)] text-ink">{g.title}</h3>
                     <p className="mt-3 max-w-md text-[0.98rem] leading-relaxed text-ink-soft">

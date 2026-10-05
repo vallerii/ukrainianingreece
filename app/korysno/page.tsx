@@ -81,7 +81,7 @@ export default async function Page({ searchParams }: Props) {
                 {topics.map((t, i) => (
                   <Reveal key={t.slug} delay={Math.min(i, 4) * 0.04} className="border-b border-r border-line">
                     <Link href={`/korysno/${t.slug}`} className="group flex h-full flex-col p-7 transition-colors hover:bg-sky-deep">
-                      <span className="font-display text-sm text-mute/70 group-hover:text-wheat-400">
+                      <span className="font-display text-sm text-mute group-hover:text-wheat-400">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <h2 className="display mt-6 text-[1.45rem] leading-tight text-ink group-hover:text-paper">{t.title}</h2>

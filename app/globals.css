@@ -69,7 +69,7 @@
   --color-sky-100: #D6E8FA;
 
   /* Wheat field */
-  --color-wheat-700: #B37A00;
+  --color-wheat-700: #8A5E00; /* темніший — для тексту на світлому (WCAG AA) */
   --color-wheat-500: #F2B705;
   --color-wheat-400: #FFC93C;
   --color-wheat-200: #FFE9A8;
@@ -78,7 +78,7 @@
   /* Neutrals */
   --color-ink: #0A1420;
   --color-ink-soft: #2C3A48;
-  --color-mute: #6B7A89;
+  --color-mute: #5C6B79; /* ≥4.5:1 на paper і paper-dim (WCAG AA) */
   --color-line: #DFDACE;
   --color-paper: #FBF8F1;
   --color-paper-dim: #F2EDE2;
@@ -163,8 +163,25 @@
   }
 }
 
+/* видимий фокус для клавіатури (WCAG 2.4.7) */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-sky-500);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* біжучий рядок партнерів */
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee { animation: marquee 34s linear infinite; }
+.marquee:hover,
+.marquee:focus-within { animation-play-state: paused; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .marquee { animation: none; flex-wrap: wrap; flex-shrink: 1; width: 100%; row-gap: 1rem; padding-inline: 1rem; }
+  .marquee > [aria-hidden="true"] { display: none; }
 }
 
 /* ── Тексти з CMS (WYSIWYG-HTML) ─────────────────────────── */

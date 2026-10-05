@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import DonateLink from "@/components/donate/DonateLink";
-import { motion } from "motion/react";
 import { site, type NavItem } from "@/lib/site";
 import Image from "next/image";
 import SocialIcon from "@/components/ui/SocialIcon";
+import NewsletterForm from "./NewsletterForm";
 
 export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; reportsHref?: string | null }) {
   return (
@@ -16,8 +16,8 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
             <Link href="/" className="flex items-center gap-4">
               <span className="relative block h-20 w-20 shrink-0 overflow-hidden rounded-full ring-1 ring-white/15">
                 <Image
-                  src="/logo.png"
-                  alt={site.name}
+                  src="/logo-mark.png"
+                  alt=""
                   width={200}
                   height={200}
                   className="h-full w-full object-cover"
@@ -135,30 +135,12 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
               <p className="mt-4 text-[0.92rem] leading-relaxed text-sky-100/70">
                 Новини спільноти раз на місяць.
               </p>
-              <form
-                className="mt-5 flex items-center gap-3 border-b border-white/25 pb-2"
-                onSubmit={(e) => e.preventDefault()}
-              >
-                <input
-                  type="email"
-                  required
-                  placeholder="e-mail"
-                  className="w-full bg-transparent text-[0.92rem] text-paper outline-none placeholder:text-white/35"
-                />
-                <motion.button
-                  whileHover={{ x: 4 }}
-                  type="submit"
-                  aria-label="Підписатися"
-                  className="text-lg text-wheat-400"
-                >
-                  →
-                </motion.button>
-              </form>
+              <NewsletterForm />
             </div>
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col gap-4 border-t border-white/12 pt-7 text-[0.8rem] text-sky-100/50 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-16 flex flex-col gap-4 border-t border-white/12 pt-7 text-[0.8rem] text-sky-100/65 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {site.name}
           </p>
@@ -166,7 +148,7 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
             <Link href="/polityka" className="hover:text-paper">
               Політика конфіденційності
             </Link>
-            <Link href="/kontakty" className="hover:text-paper">
+            <Link href="/kontakty#media" className="hover:text-paper">
               Для медіа
             </Link>
             <DonateLink className="text-wheat-400 hover:text-paper">Підтримати</DonateLink>

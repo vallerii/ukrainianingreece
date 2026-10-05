@@ -14,8 +14,8 @@ function Logo({ solid }: { solid: boolean }) {
     <Link href="/" className="group flex items-center gap-3.5" aria-label={site.name}>
       <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-black/10">
         <Image
-          src="/logo.png"
-          alt={site.name}
+          src="/logo-mark.png"
+          alt=""
           width={140}
           height={140}
           className="h-full w-full object-cover"

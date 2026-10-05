@@ -21,16 +21,9 @@ export default function PageHead({
         <Reveal>
           <div className="eyebrow text-sky-700">{eyebrow}</div>
         </Reveal>
-        <Reveal delay={0.05}>
-          <h1 className="display mt-5 max-w-4xl text-[clamp(2.2rem,5.6vw,4.4rem)] text-ink">
-            {title}
-          </h1>
-        </Reveal>
-        {lead && (
-          <Reveal delay={0.1}>
-            <div className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">{lead}</div>
-          </Reveal>
-        )}
+        {/* заголовок і лід без анімації появи — це LCP сторінки, показуємо одразу */}
+        <h1 className="display mt-5 max-w-4xl text-[clamp(2.2rem,5.6vw,4.4rem)] text-ink">{title}</h1>
+        {lead && <div className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">{lead}</div>}
         {children}
       </div>
     </section>

@@ -36,7 +36,7 @@ export default async function Page() {
                 href={`/proyekty/${p.slug}`}
                 className="group grid items-center gap-6 border-b border-line py-10 md:grid-cols-[4rem_1fr_13rem] md:gap-10"
               >
-                <span className="font-display text-sm text-mute/70">{p.n}</span>
+                <span className="font-display text-sm text-mute">{p.n}</span>
                 <div>
                   <p className="eyebrow text-sky-700">{p.city}</p>
                   <h2 className="display mt-3 max-w-3xl text-[clamp(1.5rem,3vw,2.4rem)] text-ink transition-colors group-hover:text-sky-700">

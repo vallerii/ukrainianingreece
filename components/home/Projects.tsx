@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
@@ -50,11 +51,13 @@ export default function Projects({ projects }: { projects: ProjectCard[] }) {
                       projects[hover].logo!.dark ? "bg-[#0B5394]" : "bg-white"
                     }`}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={projects[hover].logo!.src}
                       alt=""
-                      className="max-h-full max-w-full object-contain"
+                      width={projects[hover].logo!.width}
+                      height={projects[hover].logo!.height}
+                      sizes="300px"
+                      className="h-auto max-h-full w-auto max-w-full object-contain"
                     />
                     <span className="absolute bottom-3 right-4 font-display text-sm text-mute">
                       {projects[hover].n}
@@ -95,7 +98,7 @@ export default function Projects({ projects }: { projects: ProjectCard[] }) {
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 />
                 <div className="grid items-baseline gap-3 md:grid-cols-[4rem_1fr_auto] md:gap-8">
-                  <span className="font-display text-sm text-mute/70">{p.n}</span>
+                  <span className="font-display text-sm text-mute">{p.n}</span>
                   <div className="max-w-3xl">
                     <motion.h3
                       animate={{ x: hover === idx ? 14 : 0 }}

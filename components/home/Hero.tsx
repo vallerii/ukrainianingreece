@@ -290,8 +290,8 @@ export default function Hero() {
         <div className="shell w-full">
           <div className="max-w-4xl pt-14">
             <motion.p
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ y: 18 }}
+              animate={{ y: 0 }}
               transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
               className="eyebrow text-wheat-200"
             >
@@ -317,10 +317,11 @@ export default function Hero() {
               ))}
             </h1>
 
+            {/* без fade: цей абзац — LCP-елемент на мобільних, він має бути видимим одразу */}
             <motion.p
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ y: 18 }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="mt-7 max-w-lg text-lg leading-relaxed text-sky-100 md:text-[1.15rem]"
             >
               Одна точка входу для українців у Греції та один голос перед грецьким

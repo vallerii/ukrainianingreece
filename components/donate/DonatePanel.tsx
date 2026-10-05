@@ -75,6 +75,7 @@ export default function DonatePanel({
               ) : (
                 <span
                   key={m.amount}
+                  aria-disabled="true"
                   className="flex cursor-not-allowed flex-col items-center justify-center border border-dashed border-line py-5 text-mute"
                 >
                   <span className="display text-[1.9rem] leading-none">
@@ -156,7 +157,7 @@ function PayButton({ href, children, onNavigate }: { href: string; children: Rea
   if (!href)
     return (
       <>
-        <span className="mt-6 inline-flex cursor-not-allowed items-center gap-3 rounded-full bg-wheat-400/50 px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ink/50">
+        <span aria-disabled="true" className="mt-6 inline-flex cursor-not-allowed items-center gap-3 rounded-full bg-wheat-400/50 px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ink/50">
           {children} →
         </span>
         <NotReady />
