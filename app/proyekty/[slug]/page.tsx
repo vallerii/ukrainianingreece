@@ -7,6 +7,7 @@ import ProjectLogo from "@/components/projects/ProjectLogo";
 import SocialIcon from "@/components/ui/SocialIcon";
 import RichText from "@/components/cms/RichText";
 import Reveal from "@/components/ui/Reveal";
+import Gallery from "@/components/ui/Gallery";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -147,6 +148,19 @@ export default async function Page({ params }: Props) {
           </aside>
         </div>
       </section>
+
+      {/* Фото */}
+      {p.gallery.length > 0 && (
+        <section className="bg-paper pb-24" aria-labelledby="foto">
+          <div className="shell">
+            <div className="rule mb-8" />
+            <h2 id="foto" className="display mb-8 text-[clamp(1.5rem,2.6vw,2.1rem)] text-ink">
+              Фото
+            </h2>
+            <Gallery images={p.gallery} title={`Фото: ${p.title}`} />
+          </div>
+        </section>
+      )}
 
       {/* Наступний проєкт */}
       <Link href={`/proyekty/${next.slug}`} className="group block bg-paper-dim">

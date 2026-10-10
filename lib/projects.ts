@@ -41,6 +41,8 @@ export type Satellite = {
     socials?: { icon: SocialKey; label: string; href: string }[];
   };
   sections?: Section[];
+  /** Фотогалерея (файли в public/images/projects/<slug>/) */
+  gallery?: { src: string; width: number; height: number; alt: string }[];
   /** Організація-засновник Об’єднання: потрапляє в блок «Засновники» (/pro-nas, головна) і в лічильник */
   founder?: boolean;
 };
@@ -357,11 +359,74 @@ export const satellites: Satellite[] = [
   },
   {
     slug: "chytatskyi-klub",
-    title: "Читацький клуб",
+    title: "Український читацький клуб «Бібліотерапія»",
     navLabel: "Читацький клуб",
-    note: "Книги українською",
+    note: "Бібліотерапія · книжки українською",
     city: "Афіни",
-    summary: "Зустрічі навколо української книги. Інформація про клуб готується.",
+    summary:
+      "Щомісячні обговорення книжок українською та зустрічі з письменниками. Клуб заснувала письменниця Наталія Довгопол у 2023 році.",
+    subtitle: "Βιβλιοθεραπεία · Український читацький клуб в Афінах",
+    logo: { src: "/logos/chytatskyi-klub.jpg", width: 779, height: 800 },
+    facts: [
+      { label: "Засновано", value: "2023, Афіни" },
+      { label: "Засновниця", value: "письменниця Наталія Довгопол" },
+      { label: "Зустрічі", value: "щомісяця" },
+      { label: "Участь", value: "безкоштовна" },
+      { label: "Станом на вересень 2026", value: "близько 30 книжкових обговорень і 10 зустрічей з письменниками" },
+    ],
+    contacts: {
+      socials: [
+        { icon: "facebook", label: "Група клубу у Facebook", href: "https://www.facebook.com/share/g/1E7zfbjbKi/" },
+        { icon: "instagram", label: "@bibliotherapia.ua.gr", href: "https://www.instagram.com/bibliotherapia.ua.gr" },
+      ],
+    },
+    sections: [
+      {
+        blocks: [
+          {
+            p: "Український читацький клуб в Афінах «Βιβλιοθεραπεία» (Бібліотерапія) заснований 2023 року письменницею Наталією Довгопол.",
+          },
+          {
+            p: "Учасниці клубу обирають книжки для спільних читань та щомісяця збираються на обговорення. За час існування клубу перевага надавалася сучасним українським авторам, художнім та науково-популярним текстам, але розглядаються будь-які тексти, написані чи перекладені українською, які можна знайти в паперовому, електронному та/чи аудіоформатах.",
+          },
+          {
+            p: "У рамках клубу також проводяться зустрічі з українськими письменниками — наживо та онлайн, а також зустрічі з творчого письма.",
+          },
+          {
+            p: "Станом на вересень 2026 року проведено близько 30 книжкових обговорень та 10 зустрічей з письменниками.",
+          },
+        ],
+      },
+      {
+        title: "Як долучитися",
+        blocks: [
+          {
+            p: "Пишіть нам у приватні повідомлення — і ми радо запросимо вас на найближчу зустріч! Участь безкоштовна.",
+          },
+          {
+            p: "Учасниці клубу беруть участь у модеруванні подій та спільно вирішують, де й коли проводити зустрічі.",
+          },
+        ],
+      },
+    ],
+    gallery: [
+      { src: "/images/projects/chytatskyi-klub/01.jpg", width: 960, height: 1280, alt: "Учасниці клубу на терасі з видом на Акрополь" },
+      { src: "/images/projects/chytatskyi-klub/02.jpg", width: 1280, height: 720, alt: "Учасниці клубу з книжками після обговорення" },
+      { src: "/images/projects/chytatskyi-klub/03.jpg", width: 1280, height: 901, alt: "Обговорення «Абрикосової книгарні» Орести Осійчук у парку" },
+      { src: "/images/projects/chytatskyi-klub/04.jpg", width: 1280, height: 720, alt: "Зустріч клубу в кімнаті з розписом соняшників" },
+      { src: "/images/projects/chytatskyi-klub/05.jpg", width: 960, height: 1280, alt: "Учасниці клубу за спільним столом" },
+      { src: "/images/projects/chytatskyi-klub/06.jpg", width: 1280, height: 720, alt: "Літній книжковий пікнік у парку" },
+      { src: "/images/projects/chytatskyi-klub/07.jpg", width: 960, height: 1280, alt: "Обговорення книжки в книгарні" },
+      { src: "/images/projects/chytatskyi-klub/08.jpg", width: 720, height: 1280, alt: "Вечірня зустріч клубу в книжковому кафе" },
+      { src: "/images/projects/chytatskyi-klub/09.jpg", width: 960, height: 1280, alt: "Святкова зустріч клубу" },
+      { src: "/images/projects/chytatskyi-klub/10.jpg", width: 1280, height: 720, alt: "Книжковий пікнік на траві" },
+      { src: "/images/projects/chytatskyi-klub/11.jpg", width: 1280, height: 960, alt: "Розмова учасниць клубу" },
+      { src: "/images/projects/chytatskyi-klub/12.jpg", width: 1280, height: 960, alt: "Онлайн-зустріч із письменницею" },
+      { src: "/images/projects/chytatskyi-klub/13.jpg", width: 958, height: 1280, alt: "Книга «Мотанка» і лялька-мотанка на зустрічі" },
+      { src: "/images/projects/chytatskyi-klub/14.jpg", width: 958, height: 1280, alt: "«Абрикосова книгарня» Орести Осійчук" },
+      { src: "/images/projects/chytatskyi-klub/15.jpg", width: 1280, height: 720, alt: "Частування й книжка Артема Чеха на зустрічі" },
+      { src: "/images/projects/chytatskyi-klub/16.jpg", width: 960, height: 1280, alt: "Книжки Наталії Довгопол у руках учасниць" },
+    ],
   },
   {
     slug: "info-tsentr",

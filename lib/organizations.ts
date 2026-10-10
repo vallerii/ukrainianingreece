@@ -15,6 +15,8 @@ import { satellites } from "./projects";
 
 export type OrgLogo = { src: string; width: number; height: number; dark?: boolean };
 
+export type GalleryImage = { src: string; width: number; height: number; alt: string };
+
 export type Org = {
   n: string; // «01», «02»…
   slug: string;
@@ -34,6 +36,8 @@ export type Org = {
     socials: { icon: "facebook" | "instagram"; label: string; href: string }[];
   };
   html: string;
+  /** Фотогалерея (поле «Gallery» у DatoCMS) */
+  gallery: GalleryImage[];
   founder: boolean;
 };
 
@@ -109,6 +113,7 @@ function fromCms(o: RawOrg, i: number): Org {
       ],
     },
     html: toHtml(o.content),
+    gallery: [],
     founder: Boolean(o.isFounder),
   };
 }
@@ -147,6 +152,7 @@ function fromStatic(): Org[] {
             .join(""),
       )
       .join(""),
+    gallery: s.gallery ?? [],
     founder: Boolean(s.founder),
   }));
 }
@@ -162,12 +168,45 @@ export const getOrganizations = cache(async (): Promise<Org[]> => {
         }
       }`,
     );
-    if (data.items.length > 0) return data.items.map(fromCms);
+    if (data.items.length > 0) {
+      const orgs = data.items.map(fromCms);
+      const galleries = await getGalleries();
+      return orgs.map((o) => ({ ...o, gallery: galleries[o.slug] ?? [] }));
+    }
   } catch {
     // модель ще не налаштована — нижче запасний варіант
   }
   return fromStatic();
 });
+
+/**
+ * Галереї — окремим запитом: якщо поле «gallery» ще не додано в модель
+ * (не запущено scripts/datocms-setup.mjs), решта даних організацій однаково працює.
+ */
+async function getGalleries(): Promise<Record<string, GalleryImage[]>> {
+  try {
+    const data = await datoRequest<{
+      items: { slug: string; gallery: { url: string; width: number | null; height: number | null; alt: string | null; title: string | null }[] }[];
+    }>(
+      `query OrganizationGalleries {
+        items: allOrganizations(first: 100) { slug gallery { url width height alt title } }
+      }`,
+    );
+    return Object.fromEntries(
+      data.items.map((o) => [
+        o.slug,
+        (o.gallery ?? []).map((g) => ({
+          src: g.url,
+          width: g.width ?? 1200,
+          height: g.height ?? 900,
+          alt: g.alt || g.title || "",
+        })),
+      ]),
+    );
+  } catch {
+    return {};
+  }
+}
 
 export async function getOrganization(slug: string) {
   return (await getOrganizations()).find((o) => o.slug === slug) ?? null;

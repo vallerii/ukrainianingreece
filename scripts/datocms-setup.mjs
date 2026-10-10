@@ -119,6 +119,7 @@ const MODELS = [
       { api_key: "facts", label: "Facts", field_type: "text", hint: "Кожен факт з нового рядка у форматі «Назва: значення», напр. «Засновано: 2011, Афіни»" },
       { api_key: "logo", label: "Logo", field_type: "file" },
       { api_key: "logo_dark", label: "Logo on dark background", field_type: "boolean", hint: "Увімкнути, якщо логотип світлий і його треба показувати на синьому тлі" },
+      { api_key: "gallery", label: "Photo gallery", field_type: "gallery", hint: "Фото з зустрічей і подій. Порядок — перетягуванням; заповніть Alt (опис фото) для кожного" },
       { api_key: "website", label: "Website", field_type: "string" },
       { api_key: "facebook", label: "Facebook", field_type: "string" },
       { api_key: "instagram", label: "Instagram", field_type: "string" },

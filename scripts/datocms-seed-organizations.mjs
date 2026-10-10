@@ -56,16 +56,16 @@ async function waitJob(id) {
   throw new Error("Job timeout");
 }
 
-// ── логотипи ──────────────────────────────────────────────────
+// ── файли (логотипи, фото) ──────────────────────────────────────────────────
 const CACHE = "scripts/.datocms-uploads.json";
 const cache = existsSync(CACHE) ? JSON.parse(readFileSync(CACHE, "utf8")) : {};
 const MIME = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", svg: "image/svg+xml", webp: "image/webp" };
 
-async function uploadLogo(file) {
+async function uploadFile(file, kind = "логотип") {
   if (!file) return null;
   if (cache[file]) return cache[file];
   if (!existsSync(file)) {
-    console.warn(`   ! немає файлу ${file} — логотип пропущено`);
+    console.warn(`   ! немає файлу ${file} — ${kind} пропущено`);
     return null;
   }
   const filename = basename(file);
@@ -82,7 +82,7 @@ async function uploadLogo(file) {
   const upload = await cma("POST", "/uploads", { type: "upload", attributes: { path: req.id } });
   cache[file] = upload.id;
   writeFileSync(CACHE, JSON.stringify(cache, null, 2));
-  console.log(`   ↑ логотип ${filename}`);
+  console.log(`   ↑ ${kind} ${filename}`);
   return upload.id;
 }
 
@@ -98,21 +98,32 @@ const existing = await cma("GET", `/items?filter[type]=${model.id}&page[limit]=1
 const bySlug = Object.fromEntries(existing.map((it) => [it.attributes.slug, it]));
 
 for (const org of seed) {
-  const { logo_file, ...fields } = org;
-  const uploadId = await uploadLogo(logo_file);
-  const attributes = { ...fields, logo: uploadId ? { upload_id: uploadId } : null };
+  const { logo_file, gallery_files = [], ...fields } = org;
+  // назву друкуємо ДО завантаження файлів — щоб було видно, до якої організації вони належать
+  console.log(`\n${org.name}`);
+  const uploadId = await uploadFile(logo_file);
+  const gallery = [];
+  for (const g of gallery_files) {
+    const id = await uploadFile(g.file, "фото");
+    if (id) gallery.push({ upload_id: id, alt: g.alt ?? null, title: null, custom_data: {}, focal_point: null });
+  }
+  const attributes = {
+    ...fields,
+    logo: uploadId ? { upload_id: uploadId } : null,
+    ...(gallery_files.length ? { gallery } : {}),
+  };
 
   let item = bySlug[org.slug];
   if (item) {
     item = await cma("PUT", `/items/${item.id}`, { type: "item", id: item.id, attributes });
-    console.log(`↻ ${org.name}`);
+    console.log("   ↻ оновлено");
   } else {
     item = await cma("POST", "/items", {
       type: "item",
       attributes,
       relationships: { item_type: { data: { type: "item_type", id: model.id } } },
     });
-    console.log(`✔ ${org.name}`);
+    console.log("   ✔ створено");
   }
   await cma("PUT", `/items/${item.id}/publish`);
 }

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEvent, getEventSlugs, getUpcomingEvents, statusLabel, type CmsEvent } from "@/lib/cms";
 import { formatRange } from "@/lib/format";
 import PageHead from "@/components/cms/PageHead";
+import Gallery from "@/components/ui/Gallery";
 import RichText from "@/components/cms/RichText";
 import Cover from "@/components/cms/Cover";
 import EventRow from "@/components/cms/EventRow";
@@ -172,26 +172,16 @@ export default async function Page({ params }: Props) {
               <div className="pt-10">
                 <RichText html={event.report.html} className="max-w-[44rem]" />
                 {event.report.gallery.length > 0 && (
-                  <div className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
-                    {event.report.gallery.map((img, i) => (
-                      <a
-                        key={img.url}
-                        href={img.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`group relative block overflow-hidden bg-paper ${
-                          i === 0 ? "col-span-2 row-span-2 aspect-square md:aspect-auto" : "aspect-square"
-                        }`}
-                      >
-                        <Image
-                          src={img.url}
-                          alt={img.alt ?? img.title ?? ""}
-                          fill
-                          sizes={i === 0 ? "(min-width: 768px) 66vw, 100vw" : "(min-width: 768px) 33vw, 50vw"}
-                          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                        />
-                      </a>
-                    ))}
+                  <div className="mt-12">
+                    <Gallery
+                      title={`Фото: ${event.title}`}
+                      images={event.report.gallery.map((img) => ({
+                        src: img.url,
+                        width: img.width,
+                        height: img.height,
+                        alt: img.alt ?? img.title ?? "",
+                      }))}
+                    />
                   </div>
                 )}
               </div>
