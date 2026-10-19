@@ -1,15 +1,15 @@
 import Link from "next/link";
 import FormLink from "@/components/forms/FormLink";
 import { buildStats } from "@/lib/site";
-import { getOrganizations, toFounders } from "@/lib/organizations";
-
-export const revalidate = 60;
+import { getOrganizations, toNetwork } from "@/lib/organizations";
 import { foundersPhrase } from "@/lib/projects";
-import { goals, geography, team, timeline, values } from "@/lib/about";
+import { audiences, goals, geography, mission, team, timeline, values, vision } from "@/lib/about";
 import SectionHead from "@/components/ui/SectionHead";
 import Reveal from "@/components/ui/Reveal";
 import AboutNav from "@/components/about/AboutNav";
 import Founders from "@/components/about/Founders";
+
+export const revalidate = 60;
 
 export const metadata = {
   title: "Про нас",
@@ -18,12 +18,13 @@ export const metadata = {
 };
 
 export default async function Page() {
-  const founders = toFounders(await getOrganizations());
-  const stats = buildStats(founders.length);
+  const network = toNetwork(await getOrganizations());
+  const foundersCount = network.filter((o) => o.role === "Засновник").length;
+  const stats = buildStats(foundersCount);
   return (
     <>
       {/* ── Шапка сторінки ─────────────────────────────── */}
-      <section className="relative overflow-hidden bg-paper-dim pb-16 pt-40 md:pt-44">
+      <section className="relative overflow-hidden bg-paper-dim pb-12 pt-32 md:pt-36">
       <div className="absolute inset-0 bg-[radial-gradient(72%_90%_at_88%_0%,rgba(255,201,60,0.30),transparent_66%),radial-gradient(58%_80%_at_2%_8%,rgba(42,123,209,0.12),transparent_62%)]" />
       <div className="grain" />
         <div className="shell relative">
@@ -31,16 +32,14 @@ export default async function Page() {
             <p className="eyebrow text-sky-700">Про нас</p>
           </Reveal>
           <Reveal delay={0.05}>
-            <h1 className="display mt-5 max-w-4xl text-[clamp(2.2rem,5.6vw,4.4rem)] text-ink">
-              Одна спільнота,
-              <br />
-              зібрана з <span className="text-sky-700">багатьох</span>.
+            <h1 className="display mt-5 max-w-4xl text-[clamp(1.76rem,4.48vw,3.52rem)] text-ink">
+              Сильний і згуртований <span className="text-sky-700">голос українців</span> у Греції
             </h1>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              Українські організації, школи, клуби та ініціативи Греції, які вирішили
-              працювати разом — під одним іменем і з одним голосом.
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-soft">
+              Підтримка, єдність і спільна дія — з 2023 року ми об’єднуємо українські
+              організації та спільноти в Афінах і на Криті.
             </p>
           </Reveal>
         </div>
@@ -49,54 +48,65 @@ export default async function Page() {
       <AboutNav />
 
       {/* ── Хто ми є ───────────────────────────────────── */}
-      <section id="opys" className="scroll-mt-32 bg-paper py-24 md:py-32">
+      <section id="opys" className="scroll-mt-32 bg-paper py-12 md:py-16">
         <div className="shell">
-          <SectionHead eyebrow="Хто ми є" title="Не фонд і не земляцтво. Мережа спільнот під одним дахом." />
+          <SectionHead
+            eyebrow="Хто ми є"
+            title="Мережа українських організацій та спільнот в Греції, об’єднаних спільними цінностями та прагненнями."
+          />
 
-          <div className="grid gap-14 pt-12 lg:grid-cols-[1.15fr_1fr] lg:gap-20">
-            <div className="space-y-6 text-[1.05rem] leading-relaxed text-ink-soft">
+          <div className="grid gap-10 pt-8 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+            <div className="space-y-5 text-[1.05rem] leading-relaxed text-ink-soft">
               <Reveal>
                 <p>
-                  Об’єднана українська діаспора в Греції — це не благодійний фонд і не класичне
-                  земляцтво. Це структура, яка збирає докупи те, що вже існує: організації,
-                  школи, клуби та ініціативи, створені самими українцями в різних містах країни.
+                  Об’єднана українська діаспора в Греції — сильний і згуртований голос українців у
+                  Греції. Ми сприяємо збереженню культурної ідентичності та інтеграції, підтримуємо
+                  й розширюємо можливості українців, які тут живуть.
                 </p>
               </Reveal>
               <Reveal delay={0.05}>
                 <p>
-                  Всередині ми працюємо як <strong className="font-medium text-ink">одна точка входу</strong>.
-                  Людині, яка щойно приїхала, не треба знати, хто саме опікується школами, а хто —
-                  документами: достатньо звернутися до нас. Ззовні ми працюємо як{" "}
-                  <strong className="font-medium text-ink">один голос</strong> — грецькій владі,
-                  муніципалітетам, медіа та донорам набагато простіше мати одного співрозмовника,
-                  ніж десять розрізнених.
+                  Об’єднання засноване у 2023 році. Сьогодні ми представляємо{" "}
+                  <strong className="font-medium text-ink">п’ять українських організацій</strong> та
+                  неформальні українські спільноти в Афінах і на острові Крит.
                 </p>
               </Reveal>
               <Reveal delay={0.1}>
                 <p>
-                  Кожна організація-засновниця зберігає свою назву, свою команду й свої проєкти.
-                  Об’єднання не поглинає — воно додає: спільний бренд, спільний календар,
-                  спільні ресурси й представництво там, куди поодинці не дотягнутися.
+                  Ми сприяємо співпраці й взаємопідтримці, допомагаємо українцям знаходити необхідні
+                  ресурси та представляємо інтереси громади у діалозі з грецькою владою, медіа й
+                  партнерами. Особлива увага — найвразливішим: жінкам, дітям і людям похилого віку.
                 </p>
+              </Reveal>
+              <Reveal delay={0.12}>
+                <div className="border-t border-line pt-5">
+                  <p className="eyebrow text-mute">Для кого ми працюємо</p>
+                  <ul className="mt-3 space-y-1.5">
+                    {audiences.map((a) => (
+                      <li key={a} className="flex gap-3">
+                        <span className="text-sky-700">—</span>
+                        {a}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </Reveal>
             </div>
 
-            <div className="space-y-10">
+            <div className="space-y-8">
               <Reveal delay={0.08}>
                 <div className="border-t border-line pt-6">
                   <p className="eyebrow text-sky-700">Місія</p>
-                  <p className="display mt-4 text-[clamp(1.3rem,2.4vw,1.8rem)] leading-snug text-ink">
-                    Єднати українців у Греції, підтримувати одне одного та зберігати культурну
-                    й мовну ідентичність далеко від дому.
+                  <p className="display mt-4 text-[clamp(1.04rem,1.92vw,1.44rem)] leading-snug text-ink">
+                    {mission}
                   </p>
                 </div>
               </Reveal>
               <Reveal delay={0.14}>
                 <div className="border-t border-line pt-6">
                   <p className="eyebrow text-sky-700">Візія</p>
-                  <p className="display mt-4 text-[clamp(1.3rem,2.4vw,1.8rem)] leading-snug text-ink">
-                    Головна платформа єднання української спільноти в Греції — простір, де кожен
-                    знайде підтримку, спільноту та можливість долучитися.
+                  <p className="display mt-4 text-[clamp(1.04rem,1.92vw,1.44rem)] leading-snug text-ink">
+                    {vision}
                   </p>
                 </div>
               </Reveal>
@@ -104,14 +114,14 @@ export default async function Page() {
           </div>
 
           {/* цінності */}
-          <div className="mt-20">
+          <div className="mt-12">
             <Reveal>
               <p className="eyebrow text-mute">Цінності</p>
             </Reveal>
-            <div className="mt-8">
+            <div className="mt-5">
               {values.map((v, idx) => (
                 <Reveal key={v.k} delay={idx * 0.05}>
-                  <div className="grid gap-2 border-t border-line py-6 sm:grid-cols-[14rem_1fr] sm:gap-10">
+                  <div className="grid gap-1.5 border-t border-line py-4 sm:grid-cols-[16rem_1fr] sm:gap-10">
                     <p className="display text-[1.25rem] text-ink">{v.k}</p>
                     <p className="max-w-2xl text-[1rem] leading-relaxed text-ink-soft">{v.v}</p>
                   </div>
@@ -121,10 +131,10 @@ export default async function Page() {
           </div>
 
           {/* цифри */}
-          <div className="mt-20 grid grid-cols-2 gap-y-10 border-t border-line pt-10 md:grid-cols-4">
+          <div className="mt-12 grid grid-cols-2 gap-y-8 border-t border-line pt-8 md:max-w-xl">
             {stats.map((s, idx) => (
               <Reveal key={s.label} delay={idx * 0.07}>
-                <p className="display text-[clamp(2.4rem,5vw,4rem)] text-sky-700">{s.value}</p>
+                <p className="display text-[clamp(1.92rem,4vw,3.2rem)] text-sky-700">{s.value}</p>
                 <p className="mt-2 max-w-[12rem] text-sm leading-snug text-mute">{s.label}</p>
               </Reveal>
             ))}
@@ -133,17 +143,17 @@ export default async function Page() {
       </section>
 
       {/* ── Цілі ───────────────────────────────────────── */}
-      <section id="tsili" className="scroll-mt-32 bg-paper-dim py-24 md:py-32">
+      <section id="tsili" className="scroll-mt-32 bg-paper-dim py-12 md:py-16">
         <div className="shell">
           <SectionHead eyebrow="Цілі" title="Що ми робимо щодня" />
 
           <div className="grid gap-x-16 gap-y-2 pt-6 md:grid-cols-2">
             {goals.map((g, idx) => (
               <Reveal key={g.n} delay={idx * 0.06}>
-                <div className="grid grid-cols-[3rem_1fr] gap-4 border-b border-line py-8 md:gap-6 md:py-10">
+                <div className="grid grid-cols-[3rem_1fr] gap-4 border-b border-line py-6 md:gap-6 md:py-7">
                   <span className="font-display text-sm text-mute">{g.n}</span>
                   <div>
-                    <h3 className="display text-[clamp(1.4rem,2.6vw,2rem)] text-ink">{g.title}</h3>
+                    <h3 className="display text-[clamp(1.12rem,2.08vw,1.6rem)] text-ink">{g.title}</h3>
                     <p className="mt-3 max-w-md text-[0.98rem] leading-relaxed text-ink-soft">
                       {g.text}
                     </p>
@@ -156,17 +166,17 @@ export default async function Page() {
       </section>
 
       {/* ── Історія ────────────────────────────────────── */}
-      <section id="istoriya" className="scroll-mt-32 bg-sky-deep py-24 md:py-32">
+      <section id="istoriya" className="scroll-mt-32 bg-sky-deep py-12 md:py-16">
         <div className="shell">
           <SectionHead eyebrow="Історія" title="Як усе почалося" tone="dark" />
 
           <div className="pt-6">
             {timeline.map((t, idx) => (
               <Reveal key={t.year} delay={idx * 0.06}>
-                <div className="grid items-baseline gap-3 border-b border-white/12 py-9 md:grid-cols-[12rem_1fr] md:gap-12 md:py-11">
+                <div className="grid items-baseline gap-3 border-b border-white/12 py-6 md:grid-cols-[12rem_1fr] md:gap-12 md:py-7">
                   <p className="display text-[1.6rem] text-wheat-400 md:text-[2rem]">{t.year}</p>
                   <div>
-                    <h3 className="display text-[clamp(1.3rem,2.4vw,1.9rem)] text-paper">
+                    <h3 className="display text-[clamp(1.04rem,1.92vw,1.52rem)] text-paper">
                       {t.title}
                     </h3>
                     <p className="mt-3 max-w-2xl text-[0.98rem] leading-relaxed text-sky-100/75">
@@ -181,16 +191,16 @@ export default async function Page() {
       </section>
 
       {/* ── Географія ──────────────────────────────────── */}
-      <section id="geografiya" className="scroll-mt-32 bg-paper py-24 md:py-32">
+      <section id="geografiya" className="scroll-mt-32 bg-paper py-12 md:py-16">
         <div className="shell">
           <SectionHead eyebrow="Географія" title="Де ми присутні" />
 
           <div className="grid gap-x-16 gap-y-2 pt-6 md:grid-cols-2">
             {geography.map((g, idx) => (
               <Reveal key={g.city} delay={idx * 0.06}>
-                <div className="border-b border-line py-8 md:py-10">
+                <div className="border-b border-line py-6 md:py-7">
                   <p className="eyebrow text-sky-700">{g.role}</p>
-                  <h3 className="display mt-3 text-[clamp(1.6rem,3vw,2.4rem)] text-ink">
+                  <h3 className="display mt-3 text-[clamp(1.28rem,2.4vw,1.92rem)] text-ink">
                     {g.city}
                   </h3>
                   <p className="mt-3 max-w-md text-[0.98rem] leading-relaxed text-ink-soft">
@@ -204,7 +214,7 @@ export default async function Page() {
       </section>
 
       {/* ── Команда ────────────────────────────────────── */}
-      <section id="komanda" className="scroll-mt-32 bg-paper-dim py-24 md:py-32">
+      <section id="komanda" className="scroll-mt-32 bg-paper-dim py-12 md:py-16">
         <div className="shell">
           <SectionHead eyebrow="Команда" title="Люди спільноти" />
 
@@ -222,21 +232,22 @@ export default async function Page() {
       </section>
 
       {/* ── Засновники ─────────────────────────────────── */}
-      <section id="zasnovnyky" className="scroll-mt-32 bg-paper py-24 md:py-32">
+      <section id="zasnovnyky" className="scroll-mt-32 bg-paper py-12 md:py-16">
         <div className="shell">
           <SectionHead
-            eyebrow="Засновники"
-            title={`${foundersPhrase(founders.length)}, які започаткували об’єднання`}
+            eyebrow="Засновники та партнери"
+            title={`${foundersPhrase(foundersCount)}-засновників і партнери мережі`}
             link="/proyekty"
-            linkLabel="Проєкти спільноти"
+            linkLabel="Постійні проєкти"
           />
           <Reveal>
-            <p className="max-w-2xl pt-10 text-[1.02rem] leading-relaxed text-ink-soft">
-              Кожна з них працює у своєму місті й зі своєю аудиторією, а разом вони говорять
-              одним голосом від імені української громади Греції.
+            <p className="max-w-2xl pt-6 text-[1.02rem] leading-relaxed text-ink-soft">
+              Кожна організація працює у своєму місті й зі своєю аудиторією, а разом ми говоримо
+              одним голосом від імені української громади Греції. Мережа відкрита: нові
+              організації долучаються як партнери.
             </p>
           </Reveal>
-          <Founders founders={founders} />
+          <Founders founders={network} />
         </div>
       </section>
 
@@ -247,7 +258,7 @@ export default async function Page() {
           <div className="flex flex-wrap items-end justify-between gap-8">
             <div>
               <p className="eyebrow text-wheat-700">Далі</p>
-              <h2 className="display mt-4 max-w-2xl text-[clamp(1.8rem,4vw,3rem)] text-ink">
+              <h2 className="display mt-4 max-w-2xl text-[clamp(1.44rem,3.2vw,2.4rem)] text-ink">
                 Ваша організація теж може стати частиною мережі.
               </h2>
             </div>

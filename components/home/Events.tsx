@@ -1,72 +1,43 @@
-import Link from "next/link";
 import type { CmsEvent } from "@/lib/cms";
 import SectionHead from "@/components/ui/SectionHead";
 import Reveal from "@/components/ui/Reveal";
-import EventRow from "@/components/cms/EventRow";
+import EventCards from "./EventCards";
+
+/** Скільки карток у календарі на головній: 2 ряди по 4 (правка клієнта 18.10.2026). */
+const SLOTS = 8;
 
 /**
- * Прийдешні події (з DatoCMS). Якщо найближчих подій немає —
- * секція не зникає: показуємо, що відбулося нещодавно, і ведемо до звітів.
+ * Календар подій (з DatoCMS). Спершу прийдешні; якщо їх менше восьми —
+ * добираємо нещодавні минулі (позначені «Відбулося»), щоб сітка не зяяла.
  */
 export default function Events({ upcoming, recent }: { upcoming: CmsEvent[]; recent: CmsEvent[] }) {
-  const hasUpcoming = upcoming.length > 0;
+  // подія, що триває кілька днів (напр. школа іконопису), є і серед прийдешніх, і серед «минулих
+  // за датою початку» — показуємо її один раз; з минулих беремо лише ті, що справді завершилися
+  const seen = new Set(upcoming.map((e) => e.id));
+  const past = recent.filter((e) => e.status === "past" && !seen.has(e.id));
+  const cards = [...upcoming, ...past].slice(0, SLOTS);
 
   return (
-    <section id="podiyi" className="bg-paper py-24 md:py-32">
+    <section id="podiyi" className="bg-paper py-12 md:py-16">
       <div className="shell">
         <SectionHead
-          eyebrow={hasUpcoming ? "Прийдешні події" : "Події"}
-          title="Календар спільноти"
+          eyebrow={upcoming.length > 0 ? "Прийдешні події" : "Події"}
+          title="Календар подій"
           link="/podiyi"
           linkLabel="Усі події та звіти"
         />
 
-        {hasUpcoming ? (
-          <div>
-            {upcoming.map((e, idx) => (
-              <Reveal key={e.id} delay={idx * 0.05}>
-                <EventRow event={e} />
-              </Reveal>
-            ))}
-          </div>
+        {cards.length > 0 ? (
+          <EventCards events={cards} />
         ) : (
-          <>
-            <Reveal>
-              <div className="grid gap-6 border-b border-line py-10 md:grid-cols-[8.5rem_1fr] md:gap-10">
-                <p className="eyebrow pt-1 text-mute">Незабаром</p>
-                <div>
-                  <p className="display text-[clamp(1.3rem,2.4vw,1.8rem)] text-ink">
-                    Нові події зараз плануються.
-                  </p>
-                  <p className="mt-3 max-w-xl leading-relaxed text-mute">
-                    Стежте за анонсами в соцмережах або загляньте сюди трохи згодом.
-                  </p>
-                </div>
-              </div>
-            </Reveal>
-            {recent.length > 0 && (
-              <>
-                <Reveal>
-                  <p className="eyebrow mt-14 text-sky-700">Нещодавно відбулися</p>
-                </Reveal>
-                <div className="mt-2">
-                  {recent.map((e, idx) => (
-                    <Reveal key={e.id} delay={idx * 0.05}>
-                      <EventRow event={e} compact />
-                    </Reveal>
-                  ))}
-                </div>
-                <Reveal>
-                  <Link
-                    href="/podiyi/zvity"
-                    className="link-underline mt-8 inline-block text-sm font-bold text-ink"
-                  >
-                    Архів подій і звітів →
-                  </Link>
-                </Reveal>
-              </>
-            )}
-          </>
+          <Reveal>
+            <div className="py-10">
+              <p className="display text-[clamp(1.2rem,2vw,1.5rem)] text-ink">Нові події зараз плануються.</p>
+              <p className="mt-2 max-w-xl leading-relaxed text-mute">
+                Стежте за анонсами в соцмережах або загляньте сюди трохи згодом.
+              </p>
+            </div>
+          </Reveal>
         )}
       </div>
     </section>

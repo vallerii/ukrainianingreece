@@ -25,7 +25,7 @@ function Group({ id, title, count, children }: { id: string; title: string; coun
   return (
     <section id={id} className="scroll-mt-32 pt-14 first:pt-0">
       <div className="flex items-baseline justify-between border-b border-ink pb-3">
-        <h2 className="display text-[clamp(1.5rem,2.6vw,2.1rem)] text-ink">{title}</h2>
+        <h2 className="display text-[clamp(1.2rem,2.08vw,1.68rem)] text-ink">{title}</h2>
         <span className="text-sm tabular-nums text-mute">{count}</span>
       </div>
       <ul>{children}</ul>

@@ -42,17 +42,12 @@ export default function Cover({
             className="object-cover"
           />
         ) : (
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(145deg, hsl(${hue} 58% 44%), hsl(${hue + 26} 76% 62%) 60%, hsl(${
-                hue - 16
-              } 40% 28%))`,
-            }}
-          />
+          // фото ще немає — спокійна фірмова заглушка з гербом
+          <div className="absolute inset-0 flex items-center justify-center bg-[linear-gradient(160deg,#EAF2FB,#D6E8FA)]">
+            <Image src="/logo-mark.png" alt="" width={140} height={140} className="w-[22%] max-w-[7rem] opacity-25 grayscale" />
+          </div>
         )}
       </motion.div>
-      {!image && <div className="grain" />}
     </div>
   );
 }

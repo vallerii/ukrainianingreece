@@ -31,7 +31,7 @@ function Logo({ solid }: { solid: boolean }) {
         </span>
         <span
           className={`wordmark block text-[0.82rem] transition-colors lg:text-[0.86rem] xl:text-[0.95rem] ${
-            solid ? "text-mute" : "text-sky-100"
+            solid ? "text-mute" : "text-white"
           }`}
         >
           діаспора в Греції
@@ -63,7 +63,7 @@ export default function Header({ nav }: { nav: NavItem[] }) {
         className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-500 ${
           solid
             ? "bg-paper/92 shadow-[0_1px_0_rgba(0,0,0,0.07)] backdrop-blur-md"
-            : "bg-transparent"
+            : "bg-[linear-gradient(180deg,rgba(6,46,95,0.85)_0%,rgba(6,46,95,0.55)_70%,rgba(6,46,95,0)_100%)]"
         }`}
         onMouseLeave={() => setOpen(null)}
       >
@@ -78,8 +78,8 @@ export default function Header({ nav }: { nav: NavItem[] }) {
           }`}
         >
           <div
-            className={`shell flex h-11 items-center justify-end gap-7 text-[0.72rem] ${
-              overHero ? "text-white/85" : "text-ink-soft"
+            className={`shell flex h-11 items-center justify-end gap-7 text-[0.8rem] ${
+              overHero ? "text-white" : "text-ink-soft"
             }`}
           >
             <div className="flex items-center gap-5">
@@ -137,12 +137,12 @@ export default function Header({ nav }: { nav: NavItem[] }) {
               <div key={item.href} onMouseEnter={() => setOpen(item.label)}>
                 <Link
                   href={item.href}
-                  className={`relative block px-3.5 py-2 text-[14px] font-regular tracking-tight transition-colors ${
-                    tone ? "text-ink-soft hover:text-ink" : "text-white/90 hover:text-white"
+                  className={`relative block px-3.5 py-2 text-[15.5px] font-medium transition-colors ${
+                    tone ? "text-ink hover:text-sky-700" : "text-white hover:text-wheat-200"
                   }`}
                 >
                   {item.label}
-                  {item.children && <span className="ml-1.5 text-[14px] opacity-60">▾</span>}
+                  {item.children && <span className="ml-1.5 text-[12px] opacity-70">▾</span>}
                   {open === item.label && (
                     <motion.span
                       layoutId="nav-underline"

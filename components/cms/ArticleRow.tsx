@@ -15,7 +15,7 @@ export default function ArticleRow({ article }: { article: Article }) {
         <p className="md:mt-2">{formatDate(article.date)}</p>
       </div>
       <div className="order-last md:order-none">
-        <h2 className="display max-w-2xl text-[clamp(1.4rem,2.4vw,2rem)] leading-[1.12] text-ink transition-colors group-hover:text-sky-700">
+        <h2 className="display max-w-2xl text-[clamp(1.12rem,1.92vw,1.6rem)] leading-[1.12] text-ink transition-colors group-hover:text-sky-700">
           {article.title}
         </h2>
         <p className="mt-4 max-w-2xl leading-relaxed text-ink-soft">{excerpt(article.html, 220)}</p>

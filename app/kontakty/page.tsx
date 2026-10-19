@@ -101,7 +101,7 @@ export default async function Page() {
         <div className="shell">
           <Reveal>
             <p className="eyebrow text-sky-700">Долучитися</p>
-            <h2 id="join" className="display mt-4 max-w-3xl text-[clamp(1.8rem,3.6vw,2.8rem)] text-ink">
+            <h2 id="join" className="display mt-4 max-w-3xl text-[clamp(1.44rem,2.88vw,2.24rem)] text-ink">
               Хочете допомогти чи стати частиною мережі?
             </h2>
           </Reveal>
@@ -143,7 +143,7 @@ export default async function Page() {
         <div className="shell grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
           <Reveal>
             <p className="eyebrow text-wheat-400">Для медіа</p>
-            <h2 id="media-title" className="display mt-4 text-[clamp(1.8rem,3.6vw,2.8rem)]">
+            <h2 id="media-title" className="display mt-4 text-[clamp(1.44rem,2.88vw,2.24rem)]">
               Журналістам і партнерам
             </h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-sky-100/80">
@@ -204,7 +204,7 @@ export default async function Page() {
           <div className="shell">
             <Reveal>
               <p className="eyebrow text-sky-700">Організації мережі</p>
-              <h2 id="orgs-title" className="display mt-4 text-[clamp(1.6rem,3vw,2.4rem)] text-ink">
+              <h2 id="orgs-title" className="display mt-4 text-[clamp(1.28rem,2.4vw,1.92rem)] text-ink">
                 Звʼязатися напряму
               </h2>
             </Reveal>

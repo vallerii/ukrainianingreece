@@ -53,7 +53,7 @@ export default async function Page({ searchParams }: Props) {
         <section className="bg-paper pb-28 pt-12">
           <div className="shell">
             <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-ink pb-3">
-              <h2 className="display text-[clamp(1.5rem,2.6vw,2.1rem)] text-ink">
+              <h2 className="display text-[clamp(1.2rem,2.08vw,1.68rem)] text-ink">
                 {found.length ? `Знайдено: ${found.length}` : "Нічого не знайдено"}
               </h2>
               <Link href="/korysno" className="link-underline text-sm font-semibold text-ink">
@@ -102,7 +102,7 @@ export default async function Page({ searchParams }: Props) {
             <div className="shell grid gap-10 md:grid-cols-[1fr_auto] md:items-end">
               <div>
                 <p className="eyebrow text-sky-700">Не знайшли відповідь?</p>
-                <p className="display mt-4 max-w-2xl text-[clamp(1.6rem,3vw,2.4rem)] text-ink">
+                <p className="display mt-4 max-w-2xl text-[clamp(1.28rem,2.4vw,1.92rem)] text-ink">
                   Напишіть нам — у спільноті є люди, які вже пройшли цей шлях.
                 </p>
               </div>

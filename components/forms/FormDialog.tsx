@@ -68,7 +68,7 @@ export default function FormDialog() {
               </svg>
             </button>
             <p className="eyebrow text-sky-700">{t.eyebrow}</p>
-            <h2 id="form-title" className="display mt-3 pr-10 text-[clamp(1.8rem,4vw,2.6rem)] text-ink">
+            <h2 id="form-title" className="display mt-3 pr-10 text-[clamp(1.44rem,3.2vw,2.08rem)] text-ink">
               {t.title}
             </h2>
             <p className="mt-4 max-w-xl leading-relaxed text-ink-soft">{t.lead}</p>

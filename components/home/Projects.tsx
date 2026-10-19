@@ -1,135 +1,74 @@
-"use client";
-
 import Image from "next/image";
-import { useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
 import type { ProjectCard } from "@/lib/organizations";
 import SectionHead from "@/components/ui/SectionHead";
 import Reveal from "@/components/ui/Reveal";
 
+/**
+ * Постійні проєкти на головній: нумерований список, у кожному рядку видно фото або логотип
+ * (раніше картинка з’являлася лише при наведенні — на телефоні її не було видно взагалі).
+ */
 export default function Projects({ projects }: { projects: ProjectCard[] }) {
-  const [hover, setHover] = useState<number | null>(null);
-  const wrap = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 180, damping: 24, mass: 0.4 });
-  const sy = useSpring(y, { stiffness: 180, damping: 24, mass: 0.4 });
-
-  function onMove(e: React.MouseEvent) {
-    const b = wrap.current?.getBoundingClientRect();
-    if (!b) return;
-    x.set(e.clientX - b.left);
-    y.set(e.clientY - b.top);
-  }
-
   return (
-    <section id="proyekty" className="relative overflow-hidden bg-paper py-24 md:py-32">
+    <section id="proyekty" className="relative bg-paper py-12 md:py-16">
       <div className="shell">
-        <SectionHead
-          eyebrow="Проєкти-сателіти"
-          title="Школи, клуби та ініціативи, що працюють як одна спільнота"
-          link="/proyekty"
-        />
+        <SectionHead eyebrow="Постійні проєкти" title="Що працює щотижня" link="/proyekty" />
 
-        <div ref={wrap} onMouseMove={onMove} className="relative">
-          {/* cursor preview */}
-          <AnimatePresence>
-            {hover !== null && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                style={{ x: sx, y: sy }}
-                className="pointer-events-none absolute left-0 top-0 z-20 hidden lg:block"
-              >
-                {projects[hover].logo ? (
-                  // є логотип — показуємо його на світлій (або фірмовій темній) підкладці
-                  <div
-                    className={`relative -ml-[11rem] -mt-[7rem] flex h-[14rem] w-[22rem] items-center justify-center overflow-hidden p-8 shadow-[0_20px_60px_-25px_rgba(6,46,95,0.45)] ${
-                      projects[hover].logo!.dark ? "bg-[#0B5394]" : "bg-white"
-                    }`}
-                  >
-                    <Image
-                      src={projects[hover].logo!.src}
-                      alt=""
-                      width={projects[hover].logo!.width}
-                      height={projects[hover].logo!.height}
-                      sizes="300px"
-                      className="h-auto max-h-full w-auto max-w-full object-contain"
-                    />
-                    <span className="absolute bottom-3 right-4 font-display text-sm text-mute">
-                      {projects[hover].n}
-                    </span>
-                  </div>
-                ) : (
-                  <div
-                    className="relative -ml-[11rem] -mt-[7rem] h-[14rem] w-[22rem] overflow-hidden"
-                    style={{
-                      background: `linear-gradient(140deg, hsl(${
-                        206 + hover * 22
-                      } 64% 48%), hsl(${44 - hover * 4} 88% 56%))`,
-                    }}
-                  >
-                    <div className="grain" />
-                    <span className="absolute bottom-4 left-5 font-display text-5xl font-semibold text-white/85">
-                      {projects[hover].n}
-                    </span>
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
+        <div>
           {projects.map((p, idx) => (
-            <Reveal key={p.href} delay={idx * 0.05}>
+            <Reveal key={p.href} delay={Math.min(idx, 4) * 0.04}>
               <Link
                 href={p.href}
-                onMouseEnter={() => setHover(idx)}
-                onMouseLeave={() => setHover(null)}
-                className="group relative block border-b border-line py-8 md:py-10"
+                className="group grid grid-cols-[5.5rem_1fr] items-center gap-4 border-b border-line py-4 sm:grid-cols-[2.5rem_8rem_1fr_auto] sm:gap-6 md:py-5"
               >
-                <motion.span
-                  className="absolute inset-x-0 bottom-0 h-px bg-sky-700"
-                  initial={false}
-                  animate={{ scaleX: hover === idx ? 1 : 0 }}
-                  style={{ originX: 0 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                />
-                <div className="grid items-baseline gap-3 md:grid-cols-[4rem_1fr_auto] md:gap-8">
-                  <span className="font-display text-sm text-mute">{p.n}</span>
-                  <div className="max-w-3xl">
-                    <motion.h3
-                      animate={{ x: hover === idx ? 14 : 0 }}
-                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                      className="display text-[clamp(1.5rem,3.2vw,2.6rem)] text-ink"
-                    >
-                      {p.title}
-                    </motion.h3>
-                    <motion.p
-                      animate={{
-                        x: hover === idx ? 14 : 0,
-                        opacity: hover === idx ? 1 : 0.72,
-                      }}
-                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                      className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-ink-soft"
-                    >
-                      {p.text}
-                    </motion.p>
-                  </div>
-                  <span className="flex items-center gap-5 text-[0.78rem] uppercase tracking-[0.16em] text-mute">
-                    {p.city}
-                    <span className="text-lg text-sky-700 transition-transform duration-500 group-hover:translate-x-1.5">
-                      →
-                    </span>
-                  </span>
+                <span className="hidden font-display text-sm text-mute sm:block">{p.n}</span>
+
+                <Thumb p={p} />
+
+                <div className="min-w-0">
+                  <p className="text-[0.72rem] uppercase tracking-[0.12em] text-mute sm:hidden">{p.city}</p>
+                  <h3 className="display text-[clamp(1.2rem,2.4vw,1.9rem)] text-ink transition-colors group-hover:text-sky-700">
+                    {p.title}
+                  </h3>
+                  <p className="mt-1 hidden max-w-2xl text-[0.95rem] leading-relaxed text-ink-soft sm:block">{p.text}</p>
                 </div>
+
+                <span className="hidden items-center gap-5 text-[0.78rem] uppercase tracking-[0.14em] text-mute sm:flex">
+                  {p.city}
+                  <span className="text-lg text-sky-700 transition-transform duration-500 group-hover:translate-x-1.5">→</span>
+                </span>
               </Link>
             </Reveal>
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function Thumb({ p }: { p: ProjectCard }) {
+  const box = "relative aspect-[4/3] w-full overflow-hidden";
+  if (p.photo)
+    return (
+      <div className={`${box} bg-paper-dim`}>
+        <Image
+          src={p.photo.src}
+          alt=""
+          fill
+          sizes="8rem"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      </div>
+    );
+  if (p.logo)
+    return (
+      <div className={`${box} ${p.logo.dark ? "bg-[#0B5394]" : "bg-white ring-1 ring-line"}`}>
+        <Image src={p.logo.src} alt="" fill sizes="8rem" className="object-contain p-2.5" />
+      </div>
+    );
+  return (
+    <div className={`${box} flex items-center justify-center bg-[linear-gradient(160deg,#EAF2FB,#D6E8FA)]`}>
+      <Image src="/logo-mark.png" alt="" width={48} height={48} className="w-[40%] opacity-30 grayscale" />
+    </div>
   );
 }

@@ -19,11 +19,11 @@ export default function SectionHead({
   const dark = tone === "dark";
   return (
     <Reveal>
-      <div className="flex flex-wrap items-end justify-between gap-6 pb-8">
+      <div className="flex flex-wrap items-end justify-between gap-4 pb-5">
         <div>
           <p className={`eyebrow ${dark ? "text-wheat-400" : "text-sky-700"}`}>{eyebrow}</p>
           <h2
-            className={`display mt-4 max-w-3xl text-[clamp(1.9rem,4.2vw,3.4rem)] ${
+            className={`display mt-2.5 max-w-3xl text-[clamp(1.52rem,3.36vw,2.72rem)] ${
               dark ? "text-paper" : "text-ink"
             }`}
           >

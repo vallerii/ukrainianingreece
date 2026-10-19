@@ -20,19 +20,19 @@ export default function JoinCta() {
       />
       <div className="grain" />
 
-      <div className="shell relative py-24 md:py-32">
-        <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+      <div className="shell relative py-12 md:py-16">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
           <div>
             <Reveal>
               <p className="eyebrow text-wheat-700">Долучитися</p>
             </Reveal>
             <Reveal delay={0.06}>
-              <h2 className="display mt-5 max-w-3xl text-[clamp(2.1rem,5.4vw,4.2rem)] text-ink">
+              <h2 className="display mt-3 max-w-3xl text-[clamp(1.68rem,4.32vw,3.36rem)] text-ink">
                 Спільнота — це люди, які прийшли й залишились.
               </h2>
             </Reveal>
             <Reveal delay={0.12}>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/75">
+              <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink/75">
                 Приєднуйтесь як волонтер, організація-партнер або донор. Або просто напишіть
                 нам — якщо потрібна допомога чи порада.
               </p>
@@ -49,7 +49,7 @@ export default function JoinCta() {
                 <ButtonOrDonate
                   key={b.label}
                   href={b.href}
-                  className={`group flex items-center justify-between gap-6 border-b border-ink/25 py-4 text-[1.05rem] font-semibold tracking-tight transition-colors ${
+                  className={`group flex items-center justify-between gap-6 border-b border-ink/25 py-3 text-[1.05rem] font-semibold tracking-tight transition-colors ${
                     b.primary ? "text-ink" : "text-ink/75 hover:text-ink"
                   }`}
                 >

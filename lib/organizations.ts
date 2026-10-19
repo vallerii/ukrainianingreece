@@ -1,9 +1,12 @@
 /**
- * Проєкти-сателіти / організації — з DatoCMS (модель «organization»).
+ * Організації та постійні проєкти — з DatoCMS (модель «organization»).
  *
- * Єдине джерело для: блоку «Проєкти-сателіти» на головній, /proyekty, /proyekty/[slug],
- * меню «Проєкти», блоку «Засновники» (поле «Founder of the union»), пошуку.
- * Порядок — як у DatoCMS (модель сортована, перетягуванням).
+ * Один запис = одна сторінка /proyekty/[slug]. Куди потрапляє запис, вирішують поля:
+ *   • «Founder of the union» (is_founder)  → карусель і блок «Засновники та партнери» з підписом «Засновник»;
+ *   • «Partner of the union» (is_partner)  → там само, з підписом «Партнер»;
+ *   • «Permanent project, position» (project_position) → блок «Постійні проєкти» на головній,
+ *     /proyekty і меню «Проєкти», у порядку цього числа (1, 2, 3…). Порожнє — не проєкт.
+ * Порядок засновників/партнерів — як у DatoCMS (модель сортована, перетягуванням).
  *
  * Тимчасова страховка: якщо модель ще не налаштована або в ній немає жодного
  * опублікованого запису — показуємо дані з lib/projects.ts (їх перенесено в CMS скриптом).
@@ -39,6 +42,9 @@ export type Org = {
   /** Фотогалерея (поле «Gallery» у DatoCMS) */
   gallery: GalleryImage[];
   founder: boolean;
+  partner: boolean;
+  /** Позиція в «Постійних проєктах»; null — запис не показується серед проєктів */
+  projectPosition: number | null;
 };
 
 type RawOrg = {
@@ -62,6 +68,8 @@ type RawOrg = {
   email: string | null;
   address: string | null;
   isFounder: boolean | null;
+  isPartner: boolean | null;
+  projectPosition: number | null;
 };
 
 const num = (i: number) => String(i + 1).padStart(2, "0");
@@ -115,6 +123,8 @@ function fromCms(o: RawOrg, i: number): Org {
     html: toHtml(o.content),
     gallery: [],
     founder: Boolean(o.isFounder),
+    partner: Boolean(o.isPartner),
+    projectPosition: o.projectPosition ?? null,
   };
 }
 
@@ -154,6 +164,8 @@ function fromStatic(): Org[] {
       .join(""),
     gallery: s.gallery ?? [],
     founder: Boolean(s.founder),
+    partner: Boolean(s.partner),
+    projectPosition: s.projectPosition ?? null,
   }));
 }
 
@@ -164,7 +176,7 @@ export const getOrganizations = cache(async (): Promise<Org[]> => {
         items: allOrganizations(first: 100, orderBy: position_ASC) {
           slug name shortName menuNote subtitle city summary content(markdown: true) facts
           foundedYear head logo { url width height } logoDark
-          website facebook instagram phone email address isFounder
+          website facebook instagram phone email address isFounder isPartner projectPosition
         }
       }`,
     );
@@ -174,7 +186,8 @@ export const getOrganizations = cache(async (): Promise<Org[]> => {
       return orgs.map((o) => ({ ...o, gallery: galleries[o.slug] ?? [] }));
     }
   } catch {
-    // модель ще не налаштована — нижче запасний варіант
+    // модель ще не налаштована (або не запущено scripts/datocms-update-2026-10.mjs,
+    // який додає поля is_partner / project_position) — нижче запасний варіант
   }
   return fromStatic();
 });
@@ -223,22 +236,38 @@ export type Founder = {
   href: string;
   hue: number;
   logo: OrgLogo | null;
+  role: "Засновник" | "Партнер";
 };
 
-export const toFounders = (orgs: Org[]): Founder[] =>
-  orgs
-    .filter((o) => o.founder)
-    .map((o, i) => ({
-      name: o.title,
-      short: o.navLabel,
-      city: o.city,
-      href: `/proyekty/${o.slug}`,
-      hue: FOUNDER_HUES[i % FOUNDER_HUES.length],
-      logo: o.logo,
-    }));
+/** Мережа: спершу засновники, далі партнери (кожні — у порядку DatoCMS). */
+export const toNetwork = (orgs: Org[]): Founder[] =>
+  [...orgs.filter((o) => o.founder), ...orgs.filter((o) => !o.founder && o.partner)].map((o, i) => ({
+    name: o.title,
+    short: o.navLabel,
+    city: o.city,
+    href: `/proyekty/${o.slug}`,
+    hue: FOUNDER_HUES[i % FOUNDER_HUES.length],
+    logo: o.logo,
+    role: o.founder ? "Засновник" : "Партнер",
+  }));
 
-/** Дані для блоку «Проєкти-сателіти» на головній (клієнтський компонент). */
-export type ProjectCard = { n: string; title: string; href: string; city: string; text: string; logo: OrgLogo | null };
+/** Постійні проєкти — у порядку project_position. */
+export const toProjects = (orgs: Org[]): Org[] =>
+  orgs
+    .filter((o) => o.projectPosition !== null)
+    .sort((a, b) => a.projectPosition! - b.projectPosition!)
+    .map((o, i) => ({ ...o, n: num(i) }));
+
+/** Дані для блоку «Постійні проєкти» на головній (клієнтський компонент). */
+export type ProjectCard = { n: string; title: string; href: string; city: string; text: string; logo: OrgLogo | null; photo: GalleryImage | null };
 
 export const toProjectCards = (orgs: Org[]): ProjectCard[] =>
-  orgs.map((o) => ({ n: o.n, title: o.title, href: `/proyekty/${o.slug}`, city: o.city, text: o.summary, logo: o.logo }));
+  toProjects(orgs).map((o) => ({
+    n: o.n,
+    title: o.title,
+    href: `/proyekty/${o.slug}`,
+    city: o.city,
+    text: o.summary,
+    logo: o.logo,
+    photo: o.gallery[0] ?? null,
+  }));

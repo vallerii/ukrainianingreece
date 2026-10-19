@@ -12,16 +12,18 @@ const COLS: Record<number, string> = {
   2: "lg:grid-cols-2",
   3: "lg:grid-cols-3",
   4: "lg:grid-cols-4",
+  5: "lg:grid-cols-5",
+  6: "lg:grid-cols-6",
 };
 
 export default function Founders({ founders }: { founders: Founder[] }) {
   return (
-    <div className={`mt-14 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 ${COLS[founders.length] ?? "lg:grid-cols-5"}`}>
+    <div className={`mt-8 grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-3 ${COLS[founders.length] ?? "lg:grid-cols-4"}`}>
       {founders.map((f, idx) => (
         <Reveal key={f.href} delay={idx * 0.06}>
           <Link href={f.href} className="group block">
             <div
-              className={`relative aspect-[3/4] w-full overflow-hidden ${
+              className={`relative aspect-square w-full overflow-hidden ${
                 f.logo ? (f.logo.dark ? "bg-[#0B5394]" : "bg-white ring-1 ring-line") : "bg-paper-dim"
               }`}
             >
@@ -70,7 +72,8 @@ export default function Founders({ founders }: { founders: Founder[] }) {
                 {String(idx + 1).padStart(2, "0")}
               </span>
             </div>
-            <p className="mt-4 font-display text-[1.02rem] leading-snug text-ink transition-colors group-hover:text-sky-700">
+            <p className={`eyebrow mt-3 ${f.role === "Засновник" ? "text-sky-700" : "text-wheat-700"}`}>{f.role}</p>
+            <p className="mt-1 font-display text-[1.02rem] leading-snug text-ink transition-colors group-hover:text-sky-700">
               {f.name}
             </p>
             <p className="mt-1 text-sm text-mute">{f.city}</p>

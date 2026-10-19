@@ -197,7 +197,7 @@ export default function Page() {
           <div className="max-w-[44rem] space-y-14">
             {sections.map((s, i) => (
               <section key={s.id} id={s.id} className="scroll-mt-32">
-                <h2 className="display text-[clamp(1.4rem,2.4vw,1.9rem)] text-ink">
+                <h2 className="display text-[clamp(1.12rem,1.92vw,1.52rem)] text-ink">
                   <span className="mr-3 font-display text-base text-mute">{String(i + 1).padStart(2, "0")}</span>
                   {s.title}
                 </h2>

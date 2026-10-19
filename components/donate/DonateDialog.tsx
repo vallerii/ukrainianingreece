@@ -69,7 +69,7 @@ export default function DonateDialog({ reportsHref = null }: { reportsHref?: str
               </svg>
             </button>
             <p className="eyebrow text-sky-700">Підтримати</p>
-            <h2 id="donate-title" className="display mt-3 pr-10 text-[clamp(1.8rem,4vw,2.6rem)] text-ink">
+            <h2 id="donate-title" className="display mt-3 pr-10 text-[clamp(1.44rem,3.2vw,2.08rem)] text-ink">
               Разом ми можемо більше
             </h2>
             <div className="mt-7">

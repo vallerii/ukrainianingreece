@@ -6,7 +6,7 @@ import DonateDialog from "@/components/donate/DonateDialog";
 import FormDialog from "@/components/forms/FormDialog";
 import MotionProvider from "@/components/ui/MotionProvider";
 import { buildNav, site } from "@/lib/site";
-import { getOrganizations } from "@/lib/organizations";
+import { getOrganizations, toProjects } from "@/lib/organizations";
 import { FINANCIAL_REPORTS_HREF, getFinancialReports } from "@/lib/cms";
 import { SITE_URL } from "@/lib/seo";
 
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: `%s — ${site.name}`,
   },
   description:
-    "Мережа українських організацій, шкіл, клубів та ініціатив у Греції. Одна точка входу для українців і один голос перед грецьким суспільством.",
+    "Мережа українських організацій, шкіл, клубів та ініціатив у Греції. Підтримка, єдність і спільна дія українців у Греції.",
   // og:title / og:description не задаємо: соцмережі беруть <title> і description кожної сторінки
   openGraph: {
     siteName: site.name,
@@ -42,21 +42,21 @@ export default async function RootLayout({
   ]);
   const reportsHref = reports.length > 0 ? FINANCIAL_REPORTS_HREF : null;
   // меню «Проєкти» — з DatoCMS
-  const nav = buildNav(orgs);
+  const nav = buildNav(toProjects(orgs));
 
   return (
     <html lang="uk">
       <head>
         <link
           rel="preload"
-          href="/fonts/e-Ukraine-Regular.woff2"
+          href="/fonts/fira/fira-sans-condensed-cyrillic-400-normal.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
         />
         <link
           rel="preload"
-          href="/fonts/e-UkraineHead-Light.woff2"
+          href="/fonts/fira/fira-sans-condensed-cyrillic-300-normal.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"

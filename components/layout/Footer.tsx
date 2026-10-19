@@ -72,7 +72,7 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
 
             <div>
               <Link href="/proyekty" className="eyebrow text-wheat-400 transition-opacity hover:opacity-75">
-                Проєкти
+                Постійні проєкти
               </Link>
               <ul className="mt-4 space-y-2.5">
                 {nav[3].children!.map((c) => (

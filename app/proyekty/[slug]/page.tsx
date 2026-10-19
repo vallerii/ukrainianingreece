@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getOrganization, getOrganizations } from "@/lib/organizations";
+import { getOrganization, getOrganizations, toNetwork, toProjects } from "@/lib/organizations";
 import PageHead from "@/components/cms/PageHead";
 import ProjectLogo from "@/components/projects/ProjectLogo";
 import SocialIcon from "@/components/ui/SocialIcon";
@@ -30,8 +31,16 @@ export default async function Page({ params }: Props) {
   if (!p) notFound();
 
   const full = p.html.trim().length > 0;
-  const idx = orgs.findIndex((o) => o.slug === p.slug);
-  const next = orgs[(idx + 1) % orgs.length];
+  // «Наступний» — у межах своєї групи: постійні проєкти або організації мережі
+  const projects = toProjects(orgs);
+  const isProject = p.projectPosition !== null;
+  const group = isProject
+    ? projects
+    : toNetwork(orgs).map((f) => orgs.find((o) => `/proyekty/${o.slug}` === f.href)!);
+  const idx = group.findIndex((o) => o.slug === p.slug);
+  const next = group[(idx + 1) % group.length];
+  const number = isProject ? projects[idx]?.n : String(idx + 1).padStart(2, "0");
+  const role = p.founder ? "Засновник" : p.partner ? "Партнер" : null;
   const c = p.contacts;
   const hasContacts = !!(c && (c.phone || c.email || c.address || c.website || c.socials?.length));
 
@@ -40,12 +49,18 @@ export default async function Page({ params }: Props) {
       <PageHead
         eyebrow={
           <span className="flex flex-wrap items-center gap-4">
-            <Link href="/proyekty" className="hover:text-ink">
-              ← Проєкти
-            </Link>
+            {isProject ? (
+              <Link href="/proyekty" className="hover:text-ink">
+                ← Постійні проєкти
+              </Link>
+            ) : (
+              <Link href="/pro-nas#zasnovnyky" className="hover:text-ink">
+                ← Засновники та партнери
+              </Link>
+            )}
             <span className="h-px w-8 bg-line" />
             <span>
-              {p.n} · {p.city}
+              {isProject ? `${number} · ${p.city}` : [role, p.city].filter(Boolean).join(" · ")}
             </span>
           </span>
         }
@@ -80,7 +95,20 @@ export default async function Page({ params }: Props) {
 
           {/* Бокова колонка: логотип, факти, контакти */}
           <aside className="space-y-10 lg:sticky lg:top-32 lg:self-start">
-            {p.logo && <ProjectLogo logo={p.logo} title={p.title} />}
+            {p.logo ? (
+              <ProjectLogo logo={p.logo} title={p.title} />
+            ) : p.gallery[0] ? (
+              <a href="#foto" className="block overflow-hidden bg-paper-dim">
+                <Image
+                  src={p.gallery[0].src}
+                  alt={p.gallery[0].alt}
+                  width={p.gallery[0].width}
+                  height={p.gallery[0].height}
+                  sizes="20rem"
+                  className="h-auto w-full"
+                />
+              </a>
+            ) : null}
 
             {p.facts && p.facts.length > 0 && (
               <dl className="space-y-5">
@@ -151,10 +179,10 @@ export default async function Page({ params }: Props) {
 
       {/* Фото */}
       {p.gallery.length > 0 && (
-        <section className="bg-paper pb-24" aria-labelledby="foto">
+        <section id="foto" className="bg-paper pb-24" aria-labelledby="foto">
           <div className="shell">
             <div className="rule mb-8" />
-            <h2 id="foto" className="display mb-8 text-[clamp(1.5rem,2.6vw,2.1rem)] text-ink">
+            <h2 id="foto" className="display mb-8 text-[clamp(1.2rem,2.08vw,1.68rem)] text-ink">
               Фото
             </h2>
             <Gallery images={p.gallery} title={`Фото: ${p.title}`} />
@@ -166,8 +194,8 @@ export default async function Page({ params }: Props) {
       <Link href={`/proyekty/${next.slug}`} className="group block bg-paper-dim">
         <div className="shell flex flex-wrap items-end justify-between gap-6 py-16 md:py-20">
           <div>
-            <p className="eyebrow text-sky-700">Наступний проєкт · {next.n}</p>
-            <p className="display mt-4 max-w-3xl text-[clamp(1.6rem,3.4vw,2.8rem)] text-ink transition-colors group-hover:text-sky-700">
+            <p className="eyebrow text-sky-700">{isProject ? `Наступний проєкт · ${toProjects(orgs).find((o) => o.slug === next.slug)?.n ?? ""}` : "Наступна організація"}</p>
+            <p className="display mt-4 max-w-3xl text-[clamp(1.28rem,2.72vw,2.24rem)] text-ink transition-colors group-hover:text-sky-700">
               {next.title}
             </p>
           </div>

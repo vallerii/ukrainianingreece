@@ -39,7 +39,7 @@ export default async function Page() {
             const max = Math.max(r.income ?? 0, r.expenses ?? 0) || 1;
             return (
               <article key={r.id} className="grid gap-8 border-b border-line py-12 lg:grid-cols-[12rem_1fr_18rem] lg:gap-14">
-                <p className="display text-[clamp(2.6rem,5vw,3.8rem)] leading-none text-ink">{r.year}</p>
+                <p className="display text-[clamp(2.08rem,4vw,3.04rem)] leading-none text-ink">{r.year}</p>
 
                 <div className="min-w-0">
                   <h2 className="font-display text-[1.3rem] font-semibold tracking-tight text-ink">{r.title}</h2>

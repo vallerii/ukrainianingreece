@@ -12,3 +12,4 @@ tsconfig.tsbuildinfo
 
 # кеш завантажених логотипів (scripts/datocms-seed-organizations.mjs)
 scripts/.datocms-uploads.json
+.claude-tmp/

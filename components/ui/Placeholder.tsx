@@ -15,7 +15,7 @@ export default function Placeholder({
       <div className="grain" />
       <div className="shell relative">
         <p className="eyebrow text-sky-700">{eyebrow}</p>
-        <h1 className="display mt-5 max-w-4xl text-[clamp(2.2rem,5.6vw,4.4rem)] text-ink">
+        <h1 className="display mt-5 max-w-4xl text-[clamp(1.76rem,4.48vw,3.52rem)] text-ink">
           {title}
         </h1>
         <div className="rule mt-10" />

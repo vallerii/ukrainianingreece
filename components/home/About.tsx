@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { foundersPhrase } from "@/lib/projects";
+import { mission, values, vision } from "@/lib/about";
 import type { Founder } from "@/lib/organizations";
 import Reveal from "@/components/ui/Reveal";
 
@@ -20,54 +20,43 @@ export default function About({
   useEffect(() => {
     const t = setInterval(() => setI((v) => (v + 1) % Math.max(1, founders.length)), 5200);
     return () => clearInterval(t);
-  }, []);
+  }, [founders.length]);
 
   const active = founders[i] ?? founders[0];
 
   return (
-    <section id="pro-nas" className="relative bg-paper py-24 md:py-32">
+    <section id="pro-nas" className="relative bg-paper py-12 md:py-16">
       <div className="shell">
-        <div className="grid gap-14 lg:grid-cols-[1fr_0.85fr] lg:gap-20">
+        <div className="grid gap-10 lg:grid-cols-[1fr_0.75fr] lg:gap-16">
           {/* text */}
           <div>
             <Reveal>
               <p className="eyebrow text-sky-700">Про нас</p>
             </Reveal>
             <Reveal delay={0.05}>
-              <h2 className="display mt-5 text-[clamp(2rem,4.6vw,3.6rem)] text-ink">
-                Не фонд і не земляцтво.
-                <br />
-                <span className="text-sky-700">Мережа спільнот</span> під одним дахом.
+              <h2 className="display mt-3 max-w-2xl text-[clamp(1.6rem,3.3vw,2.6rem)] text-ink">
+                <span className="text-sky-700">Мережа українських організацій та спільнот</span> в Греції,
+                об’єднаних спільними цінностями та прагненнями.
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
-                Об'єднана українська діаспора в Греції збирає в одну структуру вже існуючі
-                українські організації, школи, клуби та ініціативи. Всередині — одна точка
-                входу для тих, хто шукає підтримку чи спільноту. Ззовні — один голос для
-                грецької влади, медіа та партнерів.
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
+                Ми сприяємо співпраці й взаємопідтримці, допомагаємо українцям знаходити необхідні
+                ресурси та представляємо інтереси громади у діалозі з грецькою владою, медіа й
+                партнерами.
               </p>
             </Reveal>
 
-            <div className="mt-12 space-y-8">
+            <div className="mt-8 space-y-5">
               {[
-                {
-                  k: "Місія",
-                  v: "Єднати українців у Греції, підтримувати одне одного та представляти інтереси спільноти перед грецьким суспільством і владою.",
-                },
-                {
-                  k: "Візія",
-                  v: "Простір, де кожен українець у Греції знайде підтримку, спільноту та можливість долучитися до життя діаспори.",
-                },
-                {
-                  k: "Цінності",
-                  v: "Єдність · Взаємодопомога · Збереження культури · Відкритість · Гідність",
-                },
+                { k: "Місія", v: mission },
+                { k: "Візія", v: vision },
+                { k: "Цінності", v: values.map((x) => x.k).join(" · ") },
               ].map((row, idx) => (
                 <Reveal key={row.k} delay={0.06 * idx}>
-                  <div className="grid gap-2 border-t border-line pt-5 sm:grid-cols-[8rem_1fr] sm:gap-8">
+                  <div className="grid gap-1.5 border-t border-line pt-4 sm:grid-cols-[7rem_1fr] sm:gap-6">
                     <p className="eyebrow pt-1 text-mute">{row.k}</p>
-                    <p className="text-[1.02rem] leading-relaxed text-ink-soft">{row.v}</p>
+                    <p className="text-[1.02rem] leading-relaxed text-ink">{row.v}</p>
                   </div>
                 </Reveal>
               ))}
@@ -76,11 +65,20 @@ export default function About({
             <Reveal delay={0.1}>
               <Link
                 href="/pro-nas"
-                className="link-underline mt-10 inline-flex items-center gap-2 text-sm font-bold text-ink"
+                className="link-underline mt-8 inline-flex items-center gap-2 text-sm font-bold text-ink"
               >
                 Повна історія та команда <span>→</span>
               </Link>
             </Reveal>
+            {/* цифри — під текстом, щоб не висіли окремим рядком */}
+            <div className="mt-8 grid grid-cols-2 gap-6 border-t border-line pt-6">
+              {stats.map((s, idx) => (
+                <Reveal key={s.label} delay={idx * 0.07}>
+                  <p className="display text-[clamp(2.2rem,4.4vw,3.2rem)] leading-none text-sky-700">{s.value}</p>
+                  <p className="mt-2 text-sm leading-snug text-mute">{s.label}</p>
+                </Reveal>
+              ))}
+            </div>
           </div>
 
           {/* rotating founders */}
@@ -95,27 +93,23 @@ export default function About({
                   exit={{ opacity: 0 }}
                   transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute inset-0"
-                  style={{
-                    background: `linear-gradient(150deg, hsl(${active.hue} 62% 46%) 0%, hsl(${
-                      active.hue + 18
-                    } 72% 62%) 55%, hsl(${active.hue - 12} 46% 32%) 100%)`,
-                  }}
+                  style={{ background: "linear-gradient(165deg, #12579F 0%, #0B3F7E 55%, #062E5F 100%)" }}
                 >
                   <div className="grain" />
                   {/* логотип засновника, якщо є */}
                   {active.logo && (
-                    <div className="absolute inset-x-[18%] top-[12%] flex aspect-square items-center justify-center rounded-full bg-white p-[9%] shadow-[0_30px_60px_-30px_rgba(6,46,95,0.6)]">
+                    <div className="absolute inset-x-[16%] top-[9%] flex aspect-square items-center justify-center rounded-full bg-white p-[12%] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.5)]">
                       <Image
                         src={active.logo.src}
                         alt=""
                         width={active.logo.width}
                         height={active.logo.height}
                         sizes="240px"
-                        className="h-auto max-h-full w-auto max-w-full object-contain"
+                        className="h-full w-full object-contain"
                       />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_45%,rgba(10,20,32,0.72)_100%)]" />
+                  <div className="absolute inset-x-0 bottom-0 h-[38%] bg-[linear-gradient(180deg,transparent_0%,rgba(6,20,40,0.65)_100%)]" />
                 </motion.div>
               </AnimatePresence>
 
@@ -128,7 +122,7 @@ export default function About({
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <p className="eyebrow text-white/70">Засновник</p>
+                    <p className="eyebrow text-white/70">{active.role}</p>
                     <Link
                       href={active.href}
                       className="link-underline mt-2 block font-display text-2xl font-semibold text-white"
@@ -142,7 +136,7 @@ export default function About({
                 <div className="mt-6 flex gap-1.5">
                   {founders.map((f, idx) => (
                     <button
-                      key={f.name}
+                      key={f.href}
                       onClick={() => setI(idx)}
                       aria-label={f.name}
                       className="h-0.5 flex-1 overflow-hidden bg-white/25"
@@ -158,22 +152,10 @@ export default function About({
                 </div>
               </div>
             </div>
-            <p className="mt-4 text-sm text-mute">
-              {foundersPhrase(founders.length)} — засновники об’єднання.
-            </p>
           </Reveal>
           )}
         </div>
 
-        {/* stats */}
-        <div className="mt-24 grid grid-cols-2 gap-y-10 border-t border-line pt-10 md:grid-cols-4">
-          {stats.map((s, idx) => (
-            <Reveal key={s.label} delay={idx * 0.07}>
-              <p className="display text-[clamp(2.4rem,5vw,4rem)] text-sky-700">{s.value}</p>
-              <p className="mt-2 max-w-[12rem] text-sm leading-snug text-mute">{s.label}</p>
-            </Reveal>
-          ))}
-        </div>
       </div>
     </section>
   );

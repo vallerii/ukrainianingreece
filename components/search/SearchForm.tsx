@@ -36,7 +36,7 @@ export default function SearchForm({
         autoFocus={autoFocus}
         autoComplete="off"
         placeholder={placeholder}
-        className="w-full border-0 border-b-2 border-ink/20 bg-transparent py-4 pl-10 pr-28 font-display text-[clamp(1.3rem,2.6vw,2rem)] text-ink placeholder:text-mute/60 focus:border-sky-700 focus:outline-none"
+        className="w-full border-0 border-b-2 border-ink/20 bg-transparent py-4 pl-10 pr-28 font-display text-[clamp(1.04rem,2.08vw,1.6rem)] text-ink placeholder:text-mute/60 focus:border-sky-700 focus:outline-none"
       />
       <button
         type="submit"

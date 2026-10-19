@@ -123,7 +123,7 @@ export default async function Page({ searchParams }: Props) {
               <section>
                 <Reveal>
                   <div className="flex items-baseline justify-between border-b border-ink pb-4">
-                    <h2 className="display text-[clamp(2.4rem,5vw,3.8rem)] text-ink">{year}</h2>
+                    <h2 className="display text-[clamp(1.92rem,4vw,3.04rem)] text-ink">{year}</h2>
                     <p className="text-sm text-mute">
                       {items.length} {plural(items.length, ["подія", "події", "подій"])}
                     </p>

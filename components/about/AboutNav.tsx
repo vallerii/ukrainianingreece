@@ -38,7 +38,7 @@ export default function AboutNav() {
               <a
                 href={`#${s.id}`}
                 aria-current={active === s.id ? "true" : undefined}
-                className={`relative block px-3 py-3 text-[0.82rem] font-medium tracking-tight transition-colors ${
+                className={`relative block px-3.5 py-3 text-[0.95rem] font-medium transition-colors ${
                   active === s.id ? "text-ink" : "text-mute hover:text-ink"
                 }`}
               >

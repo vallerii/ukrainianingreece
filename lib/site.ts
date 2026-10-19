@@ -4,11 +4,15 @@ export const site = {
   name: "Об'єднана українська діаспора в Греції",
   shortName: "УДГ",
   slogan: "Разом ми — українська громада Греції",
-  // контакти — з профілю організації у Світовому конгресі українців (ukrainianworldcongress.org), жовтень 2026
-  email: "infoukrainiandiaspora@gmail.com",
-  phone: "+30 697 352 0645",
+  tagline: "Підтримка, єдність і спільна дія!",
+  // контакти — з довідки організації (документ «UA Diaspora in Greece», жовтень 2026)
+  email: "ukrdiasporagr@gmail.com",
+  phone: "+30 690 992 1678",
   address: "Feron 4, Athens 104 34",
-  cities: ["Афіни", "Салоніки", "Крит", "Патри"],
+  /** Офіс / Інформаційний центр, вул. Ферон 4 */
+  office: { hours: "10:00–17:00", phones: ["+30 697 653 3390", "+30 210 821 9950"] },
+  founded: 2023,
+  cities: ["Афіни", "Крит"],
   socials: [
     { label: "Facebook", short: "FB", icon: "facebook", href: "https://www.facebook.com/uadiasporaingreece/" },
     // Instagram / YouTube — додати, коли буде відомо посилання
@@ -36,7 +40,7 @@ export const nav: NavItem[] = [
       { label: "Історія", href: "/pro-nas#istoriya", note: "Як усе почалося" },
       { label: "Географія", href: "/pro-nas#geografiya", note: "Де ми присутні" },
       { label: "Команда", href: "/pro-nas#komanda", note: "Люди спільноти" },
-      { label: "Засновники", href: "/pro-nas#zasnovnyky", note: "Організації-партнери" },
+      { label: "Засновники та партнери", href: "/pro-nas#zasnovnyky", note: "Організації мережі" },
     ],
   },
   { label: "Новини", href: "/novyny" },
@@ -80,13 +84,14 @@ export function buildNav(projects: { navLabel: string; note: string; slug: strin
   );
 }
 
-/** Цифри для «Про нас». Кількість засновників — з DatoCMS (Founder of the union). */
+/**
+ * Цифри для «Про нас» (правка клієнта 18.10.2026 — лише дві).
+ * Кількість засновників — з DatoCMS (Founder of the union).
+ */
 export const buildStats = (foundersCount: number) => [
   {
     value: String(foundersCount),
     label: plural(foundersCount, ["організація-засновник", "організації-засновники", "організацій-засновників"]),
   },
-  { value: "4", label: "міста присутності" },
-  { value: "180+", label: "дітей у суботніх школах" },
-  { value: "2022", label: "рік нової хвилі" },
+  { value: "3", label: "міста присутності" },
 ];

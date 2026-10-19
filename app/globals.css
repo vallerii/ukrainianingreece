@@ -1,63 +1,167 @@
 @import "tailwindcss";
 
-/* e-Ukraine — офіційна шрифтова гарнітура українського бренду */
+/* Fira Sans Condensed — вузька гарнітура з кирилицею та грецькою (SIL OFL 1.1).
+   Замінила e-Ukraine 20.10.2026 за правкою клієнта: шрифт має бути вужчим. */
 @font-face {
-  font-family: "e-Ukraine Head";
-  src: url("/fonts/e-UkraineHead-Light.woff2") format("woff2");
-  font-weight: 100 300;
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-cyrillic-300-normal.woff2") format("woff2");
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;
 }
 @font-face {
-  font-family: "e-Ukraine Head";
-  src: url("/fonts/e-UkraineHead-Regular.woff2") format("woff2");
-  font-weight: 400 400;
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-greek-300-normal.woff2") format("woff2");
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;
 }
 @font-face {
-  font-family: "e-Ukraine Head";
-  src: url("/fonts/e-UkraineHead-Medium.woff2") format("woff2");
-  font-weight: 500 600;
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-ext-300-normal.woff2") format("woff2");
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
 }
 @font-face {
-  font-family: "e-Ukraine Head";
-  src: url("/fonts/e-UkraineHead-Bold.woff2") format("woff2");
-  font-weight: 700 900;
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-300-normal.woff2") format("woff2");
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
 }
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine-Light.woff2") format("woff2");
-  font-weight: 100 300;
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-cyrillic-400-normal.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;
 }
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine-Regular.woff2") format("woff2");
-  font-weight: 400 400;
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-greek-400-normal.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;
 }
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine-Medium.woff2") format("woff2");
-  font-weight: 500 600;
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-ext-400-normal.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
 }
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine-Bold.woff2") format("woff2");
-  font-weight: 700 900;
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
 }
-
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-cyrillic-500-normal.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-greek-500-normal.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-ext-500-normal.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-500-normal.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-cyrillic-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-greek-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-ext-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-cyrillic-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-greek-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-ext-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face {
+  font-family: "Fira Sans Condensed";
+  src: url("/fonts/fira/fira-sans-condensed-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
 
 @theme {
   /* Ukrainian sky */
@@ -78,19 +182,21 @@
   /* Neutrals */
   --color-ink: #0A1420;
   --color-ink-soft: #2C3A48;
-  --color-mute: #5C6B79; /* ≥4.5:1 на paper і paper-dim (WCAG AA) */
+  --color-mute: #4A5866; /* темніший — вузький шрифт потребує більшого контрасту */
   --color-line: #DFDACE;
   --color-paper: #FBF8F1;
   --color-paper-dim: #F2EDE2;
 
-  --font-display: "e-Ukraine Head", "e-Ukraine", "Segoe UI", system-ui, sans-serif;
-  --font-sans: "e-Ukraine", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Fira Sans Condensed", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Fira Sans Condensed", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
   html {
+    /* 17px: Fira Sans Condensed вужча за e-Ukraine — базовий кегль трохи більший */
+    font-size: 106.25%;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
   }
@@ -121,12 +227,12 @@
   .display {
     font-family: var(--font-display);
     font-weight: 400;
-    letter-spacing: -0.015em;
-    line-height: 1.0;
+    letter-spacing: -0.005em;
+    line-height: 1.08;
   }
   .eyebrow {
-    font-size: 0.75rem;
-    letter-spacing: 0.22em;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     font-weight: 500;
   }
@@ -136,8 +242,8 @@
     font-family: var(--font-display);
     font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.085em;
-    line-height: 1.35;
+    letter-spacing: 0.035em;
+    line-height: 1.25;
   }
   .rule {
     height: 1px;
