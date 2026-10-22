@@ -6,9 +6,8 @@
  *        article, organization:  attachments «Files», videos «Videos (YouTube)»
  *        event:                  те саме + report_attachments / report_videos — для звіту
  *      Files — будь-які файли (PDF, PowerPoint, Word…), Videos — посилання на YouTube, кожне з нового рядка.
- *   2. Блог: створює модель «Blog post» (blog_post) — назва, slug, обкладинка, текст, автор,
- *      файли, відео. Поля назви/тексту/обкладинки/автора копіюються з моделі article
- *      (ті самі мови й редактор), тож заповнюються так само, як новини.
+ *   2. Блог: окремої моделі не потрібно — Блог на сайті показує записи «article» з типом матеріалу
+ *      «Стаття». Якщо раніше скрипт створив порожню модель «Blog post», вона видаляється.
  *   3. Організації: оновлює назви «Трембіти» й «Об’єднання Українок в Греції» (раніше «Союз українок»), новий текст її сторінки
  *      і речення про неї на сторінці «Борисфену» (дані — scripts/organizations-seed.json).
  *   4. У подіях і статтях замінює «Союз(у) українок у/в Греції» → «Об’єднання Українок в Греції» (єдине написання назви).
@@ -131,100 +130,20 @@ for (const [key, defs] of Object.entries(MEDIA_FIELDS)) {
   await addFields(m, defs);
 }
 
-// ── 2. модель «Blog post» ───────────────────────────────────
+// ── 2. Блог ─────────────────────────────────────────────────
+// Правка 23.10: окремої моделі для блогу немає — Блог показує записи «article» з типом «Стаття».
+// Якщо попередня версія скрипта вже створила порожню модель «Blog post», прибираємо її.
 console.log("\n2. Блог");
-const article = model("article");
-let blog = model("blog_post");
-if (!article) {
-  console.warn("   ! немає моделі article — блог пропущено");
+const blog = model("blog_post");
+if (!blog) {
+  console.log("   • окремої моделі немає — добре (блог = статті з типом «Стаття»)");
 } else {
-  if (blog) {
-    console.log("   • модель «Blog post» вже є");
+  const posts = await cma("GET", `/items?filter[type]=${blog.id}&page[limit]=1`);
+  if (posts.length) {
+    console.warn("   ! у моделі «Blog post» є записи — не видаляю. Перенесіть їх у Article з типом «Стаття» і видаліть модель вручну.");
   } else {
-    blog = await cma("POST", "/item-types", {
-      type: "item_type",
-      attributes: {
-        name: "Blog post",
-        api_key: "blog_post",
-        draft_mode_active: article.attributes.draft_mode_active,
-        all_locales_required: article.attributes.all_locales_required,
-        sortable: false,
-      },
-    });
-    console.log("   ✔ створено модель «Blog post»");
-  }
-
-  const src = await cma("GET", `/item-types/${article.id}/fields`);
-  const srcBy = Object.fromEntries(src.map((f) => [f.attributes.api_key, f.attributes]));
-  const have = await cma("GET", `/item-types/${blog.id}/fields`);
-  const haveBy = Object.fromEntries(have.map((f) => [f.attributes.api_key, f]));
-
-  /** Копія поля статті (ті самі мови, валідатори й редактор). */
-  const copy = (key, extra = {}) => {
-    const a = srcBy[key];
-    if (!a) return null;
-    return {
-      label: a.label,
-      api_key: key,
-      field_type: a.field_type,
-      localized: a.localized,
-      validators: a.validators ?? {},
-      appearance: a.appearance,
-      hint: a.hint,
-      ...extra,
-    };
-  };
-
-  for (const key of ["title", "slug", "image", "content", "author"]) {
-    if (haveBy[key]) {
-      console.log(`   • ${key} вже є`);
-      continue;
-    }
-    let def = copy(key);
-    if (!def) {
-      console.warn(`   ! у моделі article немає поля ${key} — пропущено`);
-      continue;
-    }
-    if (key === "slug") {
-      // slug будується з назви саме цієї моделі
-      const v = { ...def.validators };
-      if (haveBy.title) v.slug_title_field = { title_field_id: haveBy.title.id };
-      else delete v.slug_title_field;
-      def = { ...def, validators: v };
-    }
-    try {
-      haveBy[key] = await cma("POST", `/item-types/${blog.id}/fields`, { type: "field", attributes: def });
-    } catch (e) {
-      // інколи редактор поля не переноситься — пробуємо зі стандартним
-      const { appearance, ...plain } = def;
-      haveBy[key] = await cma("POST", `/item-types/${blog.id}/fields`, { type: "field", attributes: plain });
-    }
-    console.log(`   + ${key}`);
-  }
-  await addFields(blog, [
-    { api_key: "attachments", ...FILES() },
-    { api_key: "videos", ...VIDEOS() },
-  ]);
-
-  // назва запису в списку = title
-  if (haveBy.title && !blog.relationships?.title_field?.data) {
-    await cma("PUT", `/item-types/${blog.id}`, {
-      type: "item_type",
-      id: blog.id,
-      relationships: { title_field: { data: { type: "field", id: haveBy.title.id } } },
-    }).catch(() => {});
-  }
-
-  // пункт меню «Блог» у розділі Content
-  const menu = await cma("GET", "/menu-items");
-  if (!menu.some((mi) => mi.relationships?.item_type?.data?.id === blog.id)) {
-    await cma("POST", "/menu-items", {
-      type: "menu_item",
-      attributes: { label: "Блог", position: 99 },
-      relationships: { item_type: { data: { type: "item_type", id: blog.id } } },
-    })
-      .then(() => console.log("   + пункт меню «Блог»"))
-      .catch((e) => console.warn("   ! пункт меню не створено — модель доступна в Content → Blog post", e.message));
+    await cma("DELETE", `/item-types/${blog.id}`);
+    console.log("   − видалено порожню модель «Blog post»");
   }
 }
 
@@ -283,7 +202,7 @@ for (const [key, fieldsToFix] of [
 
 console.log(`
 Готово. Сайт підхопить зміни протягом хвилини.
-  • Блог: Content → «Блог» (Blog post) → New record.
+  • Блог: пишіть у Article (як новини) і обирайте тип матеріалу «Стаття» — запис з’явиться в Блозі, а не в Новинах.
   • Файли/відео: у статтях, подіях і організаціях з’явилися поля «Files» і «Videos (YouTube)»,
     у подіях — ще «Report files» і «Report videos» для звіту.
 Не забудьте видалити DATOCMS_ADMIN_TOKEN з .env і сам токен у DatoCMS.`);

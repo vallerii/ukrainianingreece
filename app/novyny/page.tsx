@@ -17,7 +17,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title: page > 1 ? `Новини — сторінка ${page}` : "Новини",
     description:
-      "Новини та статті української спільноти Греції: анонси, репортажі, корисні посібники, історії людей.",
+      "Новини української спільноти Греції: анонси, репортажі, події, життя громади.",
   };
 }
 
@@ -50,10 +50,11 @@ export default async function Page({ searchParams }: Props) {
             <br />у <span className="text-sky-700">спільноті</span>
           </>
         }
-        lead="Новини, статті та посібники від української спільноти Греції — про події, освіту, допомогу та людей."
+        lead="Новини української спільноти Греції — про події, освіту, допомогу та людей. Статті на загальні теми — у Блозі."
       />
 
-      <FilterBar label="Тип матеріалу" options={options} />
+      {/* фільтр має сенс, лише коли в Новинах кілька типів (статті — окремо, у Блозі) */}
+      {types.length > 1 ? <FilterBar label="Тип матеріалу" options={options} /> : <div className="shell"><div className="border-t border-line" /></div>}
 
       <section className="bg-paper pb-28">
         <div className="shell">

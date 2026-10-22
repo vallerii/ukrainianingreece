@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getArticle, getArticleSlugs, getLatestArticles } from "@/lib/cms";
 import { excerpt, formatDate } from "@/lib/format";
 import PageHead from "@/components/cms/PageHead";
@@ -16,7 +16,7 @@ export const revalidate = 60;
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  return (await getArticleSlugs()).map(({ slug }) => ({ slug }));
+  return (await getArticleSlugs()).filter((a) => a.href.startsWith("/novyny")).map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -40,6 +40,8 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const article = await getArticle(slug);
   if (!article) notFound();
+  // стаття живе в Блозі — старі посилання ведуть туди
+  if (!article.href.startsWith("/novyny")) permanentRedirect(article.href);
 
   // спочатку того ж типу, потім доповнюємо найсвіжішими
   const [sameType, latest, media] = await Promise.all([
@@ -113,7 +115,7 @@ export default async function Page({ params }: Props) {
             <SectionHead eyebrow="Читайте також" title="Інші матеріали" link="/novyny" linkLabel="Усі новини" />
             <div className="grid gap-10 pt-10 md:grid-cols-3">
               {more.map((a) => (
-                <Link key={a.id} href={`/novyny/${a.slug}`} className="group block">
+                <Link key={a.id} href={a.href} className="group block">
                   <Cover image={a.image} hue={a.hue} sizes="(min-width: 768px) 33vw, 100vw" />
                   <p className="mt-5 flex items-center gap-3 text-[0.7rem] uppercase tracking-[0.18em] text-mute">
                     {a.type && <span className="text-sky-700">{a.type.title}</span>}

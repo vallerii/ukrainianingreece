@@ -90,7 +90,7 @@ const toFile = (f: RawFile): Attachment => {
   return { url: f.url, filename: f.filename, name: f.title?.trim() || base || f.filename, size: f.size, ext };
 };
 
-export type MediaModel = "article" | "event" | "organization" | "blogPost";
+export type MediaModel = "article" | "event" | "organization";
 
 /**
  * Файли й відео одного запису (за slug).

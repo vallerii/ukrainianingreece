@@ -22,7 +22,7 @@ export type Term = { id: string; title: string; slug: string };
 export type Article = {
   id: string;
   slug: string;
-  /** Адреса сторінки: /novyny/<slug> або /blog/<slug> */
+  /** Адреса сторінки: /novyny/<slug> або /blog/<slug> (за типом матеріалу) */
   href: string;
   title: string;
   date: string;
@@ -131,7 +131,7 @@ function toArticle(a: RawArticle): Article {
   return {
     id: a.id,
     slug: a.slug,
-    href: `/novyny/${a.slug}`,
+    href: `${a.tags && isBlogType(a.tags.title) ? "/blog" : "/novyny"}/${a.slug}`,
     title: a.title,
     date: a._firstPublishedAt,
     type: a.tags ? term(a.tags) : null,
@@ -224,16 +224,48 @@ async function fetchAll<T>(
  * Статті
  * ──────────────────────────────────────────────────────────── */
 
-/** Сторінка стрічки новин (за замовчуванням по 12), опційно — лише одного типу. */
+/**
+ * Новини і Блог — одна модель article, розділ визначає «Тип матеріалу» (article_type):
+ *   • тип «Стаття» / «Статті» / «Блог» → розділ Блог (/blog);
+ *   • усі інші типи (або без типу) → Новини (/novyny).
+ * Правка 23.10.2026: «блог — лише статті, новини — лише новини, без змішування».
+ */
+export type Section = "news" | "blog";
+
+export const isBlogType = (title: string | null | undefined) => !!title && /^(стат|блог)/i.test(title.trim());
+
+/** ID типів матеріалу, що належать Блогу. */
+const getBlogTypeIds = cache(async () => {
+  const data = await datoRequest<{ items: { id: string; title: string }[] }>(
+    `query BlogTypes { items: allArticleTypes(first: ${CHUNK}) { id title } }`,
+  );
+  return data.items.filter((t) => isBlogType(t.title)).map((t) => t.id);
+});
+
+/** Фільтр розділу; null — у розділі гарантовано нічого немає (блог без типу «Стаття»). */
+async function sectionFilter(section: Section): Promise<Filter | null> {
+  const ids = await getBlogTypeIds();
+  if (section === "blog") return ids.length ? { tags: { in: ids } } : null;
+  return ids.length ? { OR: [{ tags: { notIn: ids } }, { tags: { exists: false } }] } : {};
+}
+
+const and = (...parts: Filter[]): Filter => {
+  const list = parts.filter((p) => Object.keys(p).length);
+  return list.length === 0 ? {} : list.length === 1 ? list[0] : { AND: list };
+};
+
+/** Сторінка стрічки новин або блогу (за замовчуванням по 12), опційно — лише одного типу. */
 export const getArticlesPage = cache(
-  async (page = 1, typeId: string | null = null, size = PAGE_SIZE, locale: Locale = "uk") => {
-    const filter: Filter = typeId ? { tags: { eq: typeId } } : {};
+  async (page = 1, typeId: string | null = null, size = PAGE_SIZE, section: Section = "news") => {
+    const sec = await sectionFilter(section);
+    if (!sec) return { items: [], page, total: 0, pages: 1 } satisfies Paged<Article>;
+    const filter = and(sec, typeId ? { tags: { eq: typeId } } : {});
     const data = await datoRequest<{ items: RawArticle[]; meta: { count: number } }>(
-      `query ArticlesPage($first: IntType, $skip: IntType, $filter: ArticleModelFilter, $locale: SiteLocale) {
-        items: allArticles(locale: $locale, first: $first, skip: $skip, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
-        meta: _allArticlesMeta(locale: $locale, filter: $filter) { count }
+      `query ArticlesPage($first: IntType, $skip: IntType, $filter: ArticleModelFilter) {
+        items: allArticles(locale: uk, first: $first, skip: $skip, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
+        meta: _allArticlesMeta(locale: uk, filter: $filter) { count }
       }`,
-      { first: size, skip: (page - 1) * size, filter, locale },
+      { first: size, skip: (page - 1) * size, filter },
     );
     return {
       items: data.items.map(toArticle),
@@ -244,13 +276,16 @@ export const getArticlesPage = cache(
   },
 );
 
-/** Кілька свіжих статей (для головної та «Читайте також»). */
+/** Кілька свіжих матеріалів розділу (для головної та «Читайте також»). */
 export const getLatestArticles = cache(
-  async (count: number, opts: { typeId?: string | null; excludeId?: string } = {}) => {
-    const filter: Filter = {
-      ...(opts.typeId ? { tags: { eq: opts.typeId } } : {}),
-      ...(opts.excludeId ? { id: { neq: opts.excludeId } } : {}),
-    };
+  async (count: number, opts: { typeId?: string | null; excludeId?: string; section?: Section } = {}) => {
+    const sec = await sectionFilter(opts.section ?? "news");
+    if (!sec) return [] as Article[];
+    const filter = and(
+      sec,
+      opts.typeId ? { tags: { eq: opts.typeId } } : {},
+      opts.excludeId ? { id: { neq: opts.excludeId } } : {},
+    );
     const data = await datoRequest<{ items: RawArticle[] }>(
       `query Latest($first: IntType, $filter: ArticleModelFilter) {
         items: allArticles(locale: uk, first: $first, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
@@ -271,11 +306,16 @@ export const getArticle = cache(async (slug: string, locale: Locale = "uk") => {
   return data.article ? toArticle(data.article) : null;
 });
 
+/** Усі матеріали: slug і адреса (/novyny/… або /blog/…). */
 export const getArticleSlugs = cache(async () =>
-  fetchAll<{ slug: string }>("allArticles", "slug", { filterType: "ArticleModelFilter" }),
+  (
+    await fetchAll<{ slug: string; tags: { title: string } | null }>("allArticles", "slug tags { title }", {
+      filterType: "ArticleModelFilter",
+    })
+  ).map((a) => ({ slug: a.slug, href: `${isBlogType(a.tags?.title) ? "/blog" : "/novyny"}/${a.slug}` })),
 );
 
-/** Типи матеріалів разом із кількістю статей кожного типу. */
+/** Типи матеріалів Новин (без типів Блогу) разом із кількістю матеріалів кожного типу. */
 export const getArticleTypes = cache(async (locale: Locale = "uk") => {
   const data = await datoRequest<{ allArticleTypes: { id: string; title: string }[] }>(
     `query ArticleTypes($locale: SiteLocale) {
@@ -283,12 +323,14 @@ export const getArticleTypes = cache(async (locale: Locale = "uk") => {
     }`,
     { locale },
   );
-  const types = data.allArticleTypes.map(term);
+  const types = data.allArticleTypes.filter((t) => !isBlogType(t.title)).map(term);
+  const news = (await sectionFilter("news")) ?? {};
   const counts = await datoRequest<Record<string, { count: number }>>(
-    `query TypeCounts {
-      all: _allArticlesMeta { count }
+    `query TypeCounts($news: ArticleModelFilter) {
+      all: _allArticlesMeta(filter: $news) { count }
       ${types.map((t, i) => `t${i}: _allArticlesMeta(filter: { tags: { eq: "${t.id}" } }) { count }`).join("\n")}
     }`,
+    { news },
   );
   return {
     total: counts.all.count,

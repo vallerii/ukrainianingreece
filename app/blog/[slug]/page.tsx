@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getBlogPost, getBlogSlugs, getLatestBlogPosts, BLOG_HREF } from "@/lib/blog";
+import { getArticle, getArticleSlugs } from "@/lib/cms";
+import { getLatestBlogPosts, BLOG_HREF } from "@/lib/blog";
 import { getMedia } from "@/lib/media";
 import { excerpt, formatDate } from "@/lib/format";
 import PageHead from "@/components/cms/PageHead";
@@ -16,12 +17,12 @@ export const revalidate = 60;
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  return (await getBlogSlugs()).map(({ slug }) => ({ slug }));
+  return (await getArticleSlugs()).filter((a) => a.href.startsWith(BLOG_HREF)).map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getBlogPost((await params).slug);
-  if (!post) return {};
+  const post = await getArticle((await params).slug);
+  if (!post || !post.href.startsWith(BLOG_HREF)) return {};
   const description = excerpt(post.html, 160);
   return {
     title: post.title,
@@ -38,10 +39,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
-  if (!post) notFound();
+  const post = await getArticle(slug);
+  // у блозі — лише статті; новина за цією адресою не відкривається
+  if (!post || !post.href.startsWith(BLOG_HREF)) notFound();
 
-  const [more, media] = await Promise.all([getLatestBlogPosts(3, post.id), getMedia("blogPost", slug)]);
+  const [more, media] = await Promise.all([getLatestBlogPosts(3, post.id), getMedia("article", slug)]);
 
   return (
     <>
