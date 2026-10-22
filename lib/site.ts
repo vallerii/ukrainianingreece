@@ -7,15 +7,17 @@ export const site = {
   tagline: "Підтримка, єдність і спільна дія!",
   // контакти — з довідки організації (документ «UA Diaspora in Greece», жовтень 2026)
   email: "ukrdiasporagr@gmail.com",
-  phone: "+30 690 992 1678",
+  // основний телефон — за правкою клієнта 22.10.2026
+  phone: "+30 697 653 3390",
   address: "Feron 4, Athens 104 34",
   /** Офіс / Інформаційний центр, вул. Ферон 4 */
-  office: { hours: "10:00–17:00", phones: ["+30 697 653 3390", "+30 210 821 9950"] },
+  office: { hours: "10:00–17:00" },
   founded: 2023,
   cities: ["Афіни", "Крит"],
   socials: [
     { label: "Facebook", short: "FB", icon: "facebook", href: "https://www.facebook.com/uadiasporaingreece/" },
-    // Instagram / YouTube — додати, коли буде відомо посилання
+    { label: "Instagram", short: "IG", icon: "instagram", href: "https://www.instagram.com/ukrdiasporagr/" },
+    // YouTube — додати, коли буде відомо посилання на канал
   ] as const,
   languages: [
     { code: "uk", short: "UA", label: "Українська" },
@@ -44,6 +46,7 @@ export const nav: NavItem[] = [
     ],
   },
   { label: "Новини", href: "/novyny" },
+  { label: "Блог", href: "/blog" },
   {
     label: "Події та звіти",
     href: "/podiyi",

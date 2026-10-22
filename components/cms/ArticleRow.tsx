@@ -3,11 +3,11 @@ import type { Article } from "@/lib/cms";
 import { excerpt, formatDate } from "@/lib/format";
 import Cover from "./Cover";
 
-/** Рядок у стрічці новин: дата/тип — заголовок і анонс — мініатюра. */
+/** Рядок у стрічці новин чи блогу: дата/тип — заголовок і анонс — мініатюра. */
 export default function ArticleRow({ article }: { article: Article }) {
   return (
     <Link
-      href={`/novyny/${article.slug}`}
+      href={article.href}
       className="group grid gap-6 border-b border-line py-10 md:grid-cols-[10rem_1fr_15rem] md:gap-10 md:py-12"
     >
       <div className="flex items-center gap-4 text-[0.72rem] uppercase tracking-[0.18em] text-mute md:block">

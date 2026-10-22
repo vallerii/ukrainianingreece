@@ -27,7 +27,8 @@ export default async function Page({
   const active = tags.find((t) => t.slug === sp.tag) ?? null;
 
   const [list, past] = await Promise.all([
-    getUpcomingEvents(page, active?.id ?? null),
+    // найдальша дата — угорі (правка клієнта 22.10.2026)
+    getUpcomingEvents(page, active?.id ?? null, undefined, "desc"),
     page === 1 ? getRecentPastEvents(6, active?.id ?? null) : Promise.resolve([]),
   ]);
   if (page > list.pages) notFound();

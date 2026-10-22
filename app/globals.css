@@ -332,6 +332,9 @@
     color: var(--color-ink);
   }
   .rich img { width: 100%; height: auto; }
+  /* вбудоване відео YouTube (посилання окремим рядком у тексті або поле «Videos») */
+  .video-embed { position: relative; aspect-ratio: 16 / 9; width: 100%; background: var(--color-ink); }
+  .video-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .rich hr { border: 0; height: 1px; background: var(--color-line); margin-block: 2.5em; }
   .rich table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
   .rich th, .rich td { border-bottom: 1px solid var(--color-line); padding: 0.6em 0.5em; text-align: left; }

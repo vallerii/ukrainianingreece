@@ -90,6 +90,7 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
               <ul className="mt-4 space-y-2.5">
                 {[
                   { label: "Новини", href: "/novyny" },
+                  { label: "Блог", href: "/blog" },
                   { label: "Прийдешні події", href: "/podiyi" },
                   { label: "Звіти", href: "/podiyi/zvity" },
                   ...(reportsHref ? [{ label: "Звіти про кошти", href: reportsHref }] : []),

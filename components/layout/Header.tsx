@@ -137,7 +137,7 @@ export default function Header({ nav }: { nav: NavItem[] }) {
               <div key={item.href} onMouseEnter={() => setOpen(item.label)}>
                 <Link
                   href={item.href}
-                  className={`relative block px-3.5 py-2 text-[15.5px] font-medium transition-colors ${
+                  className={`relative block whitespace-nowrap px-2 py-2 text-[14px] font-medium transition-colors xl:px-3 xl:text-[15.5px] ${
                     tone ? "text-ink hover:text-sky-700" : "text-white hover:text-wheat-200"
                   }`}
                 >

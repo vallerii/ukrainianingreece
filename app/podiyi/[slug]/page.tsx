@@ -9,6 +9,8 @@ import RichText from "@/components/cms/RichText";
 import Cover from "@/components/cms/Cover";
 import EventRow from "@/components/cms/EventRow";
 import SectionHead from "@/components/ui/SectionHead";
+import Media from "@/components/cms/Media";
+import { getMedia, hasMedia } from "@/lib/media";
 
 export const revalidate = 60;
 
@@ -54,8 +56,14 @@ const badgeTone = {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  const [event, upcoming] = await Promise.all([getEvent(slug), getUpcomingEvents(1, null, 4)]);
+  const [event, upcoming, media, reportMedia] = await Promise.all([
+    getEvent(slug),
+    getUpcomingEvents(1, null, 4),
+    getMedia("event", slug),
+    getMedia("event", slug, "report"),
+  ]);
   if (!event) notFound();
+  const hasReport = event.hasReport || hasMedia(reportMedia);
 
   const past = event.status === "past";
   const loc = event.location;
@@ -99,6 +107,7 @@ export default async function Page({ params }: Props) {
             ) : (
               <p className="max-w-[44rem] text-lg leading-relaxed text-ink-soft">{event.description}</p>
             )}
+            <Media media={media} className="mt-14" />
           </div>
 
           {/* Бокова колонка: коли, де, теми */}
@@ -168,9 +177,10 @@ export default async function Page({ params }: Props) {
         <section id="zvit" className="scroll-mt-28 bg-paper-dim py-20 md:py-24">
           <div className="shell">
             <SectionHead eyebrow="Звіт" title="Як це було" />
-            {event.hasReport ? (
+            {hasReport ? (
               <div className="pt-10">
                 <RichText html={event.report.html} className="max-w-[44rem]" />
+                <Media media={reportMedia} tone="dim" className={event.report.html ? "mt-14" : ""} />
                 {event.report.gallery.length > 0 && (
                   <div className="mt-12">
                     <Gallery

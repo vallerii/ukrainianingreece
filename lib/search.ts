@@ -10,6 +10,7 @@
  * не змінюючи сторінку /poshuk.
  */
 import { searchCms, type Article, type CmsEvent } from "./cms";
+import { searchBlog } from "./blog";
 import { getOrganizations, type Org } from "./organizations";
 import { goals, geography, team, timeline, values } from "./about";
 import { site } from "./site";
@@ -154,6 +155,12 @@ const staticDocs = (orgs: Org[]): StaticDoc[] => [
     text: `Звʼязатися з нами. ${site.email}, ${site.phone}, ${site.address}. ${site.cities.join(", ")}.`,
   },
   {
+    title: "Блог",
+    href: "/blog",
+    section: "Сторінка",
+    text: "Блог: статті на загальні теми — життя в Греції, культура, історія, освіта, думки й розповіді людей спільноти.",
+  },
+  {
     title: "Підтримати",
     href: "/pidtrymaty",
     section: "Сторінка",
@@ -192,10 +199,10 @@ export async function searchSite(q: string): Promise<SearchResults> {
   const terms = parseQuery(q);
   if (!terms.length) return { terms, articles: [], events: [], projects: [], pages: [], total: 0 };
 
-  const [cms, orgs] = await Promise.all([searchCms(terms), getOrganizations()]);
+  const [cms, orgs, blog] = await Promise.all([searchCms(terms), getOrganizations(), searchBlog(terms)]);
   const docs = searchStatic(terms, orgs);
   // DatoCMS шукає входження будь-де в слові — лишаємо тільки збіги з початку слова
-  const articles = cms.articles.filter((a) => matchesAll(`${a.title} ${stripHtml(a.html)}`, terms));
+  const articles = [...cms.articles, ...blog].filter((a) => matchesAll(`${a.title} ${stripHtml(a.html)}`, terms));
   const events = cms.events.filter((e) =>
     matchesAll(`${e.title} ${e.description} ${stripHtml(e.html)} ${stripHtml(e.report.html)}`, terms),
   );

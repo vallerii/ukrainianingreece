@@ -137,12 +137,12 @@ export default async function Page({ searchParams }: Props) {
 
           {res && res.total > 0 && (
             <>
-              <Group id="novyny" title="Новини та статті" count={res.articles.length}>
+              <Group id="novyny" title="Новини, статті та блог" count={res.articles.length}>
                 {res.articles.map((a) => (
                   <Hit
                     key={a.id}
-                    href={`/novyny/${a.slug}`}
-                    meta={[a.type?.title, formatDate(a.date)].filter(Boolean).join(" · ")}
+                    href={a.href}
+                    meta={[a.href.startsWith("/blog") ? "Блог" : a.type?.title, formatDate(a.date)].filter(Boolean).join(" · ")}
                     title={a.title}
                     text={stripHtml(a.html)}
                     terms={t}

@@ -3,6 +3,7 @@ import { getArticleSlugs, getEventSlugs, getFinancialReports, FINANCIAL_REPORTS_
 import { getOrganizations } from "@/lib/organizations";
 import { topics } from "@/lib/korysno";
 import { absoluteUrl } from "@/lib/seo";
+import { getBlogSlugs } from "@/lib/blog";
 
 export const revalidate = 3600;
 
@@ -16,11 +17,12 @@ const safe = async <T,>(p: Promise<T>, fallback: T) => {
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articles, events, orgs, reports] = await Promise.all([
+  const [articles, events, orgs, reports, posts] = await Promise.all([
     safe(getArticleSlugs(), []),
     safe(getEventSlugs(), []),
     safe(getOrganizations(), []),
     safe(getFinancialReports(), []),
+    safe(getBlogSlugs(), []),
   ]);
 
   const page = (path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]) => ({
@@ -33,6 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     page("/", 1, "daily"),
     page("/novyny", 0.9, "daily"),
     page("/podiyi", 0.9, "daily"),
+    page("/blog", 0.8, "weekly"),
     page("/podiyi/zvity", 0.6, "weekly"),
     page("/pro-nas", 0.8, "monthly"),
     page("/proyekty", 0.8, "monthly"),
@@ -45,5 +48,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...topics.map((t) => page(`/korysno/${t.slug}`, 0.6, "monthly")),
     ...articles.map((a) => page(`/novyny/${a.slug}`, 0.6, "monthly")),
     ...events.map((e) => page(`/podiyi/${e.slug}`, 0.6, "monthly")),
+    ...posts.map((p) => page(`/blog/${p.slug}`, 0.6, "monthly")),
   ];
 }

@@ -9,6 +9,8 @@ import SocialIcon from "@/components/ui/SocialIcon";
 import RichText from "@/components/cms/RichText";
 import Reveal from "@/components/ui/Reveal";
 import Gallery from "@/components/ui/Gallery";
+import Media from "@/components/cms/Media";
+import { getMedia } from "@/lib/media";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -29,6 +31,7 @@ export default async function Page({ params }: Props) {
   const orgs = await getOrganizations();
   const p = orgs.find((o) => o.slug === slug);
   if (!p) notFound();
+  const media = await getMedia("organization", p.slug);
 
   const full = p.html.trim().length > 0;
   // «Наступний» — у межах своєї групи: постійні проєкти або організації мережі
@@ -91,6 +94,7 @@ export default async function Page({ params }: Props) {
                 </div>
               </div>
             )}
+            <Media media={media} className="mt-14" />
           </div>
 
           {/* Бокова колонка: логотип, факти, контакти */}

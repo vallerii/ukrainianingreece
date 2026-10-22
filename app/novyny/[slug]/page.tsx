@@ -8,6 +8,8 @@ import PageHead from "@/components/cms/PageHead";
 import RichText from "@/components/cms/RichText";
 import Cover from "@/components/cms/Cover";
 import SectionHead from "@/components/ui/SectionHead";
+import Media from "@/components/cms/Media";
+import { getMedia } from "@/lib/media";
 
 export const revalidate = 60;
 
@@ -40,9 +42,10 @@ export default async function Page({ params }: Props) {
   if (!article) notFound();
 
   // спочатку того ж типу, потім доповнюємо найсвіжішими
-  const [sameType, latest] = await Promise.all([
+  const [sameType, latest, media] = await Promise.all([
     article.type ? getLatestArticles(3, { typeId: article.type.id, excludeId: article.id }) : [],
     getLatestArticles(4, { excludeId: article.id }),
+    getMedia("article", article.slug),
   ]);
   const more = [...sameType, ...latest.filter((a) => !sameType.some((s) => s.id === a.id))].slice(0, 3);
 
@@ -96,7 +99,10 @@ export default async function Page({ params }: Props) {
             <div className="hidden lg:block">
               <div className="rule w-16 bg-wheat-400" />
             </div>
-            <RichText html={article.html} className="max-w-[44rem]" />
+            <div className="min-w-0">
+              <RichText html={article.html} className="max-w-[44rem]" />
+              <Media media={media} className="mt-14" />
+            </div>
           </div>
         </div>
       </article>

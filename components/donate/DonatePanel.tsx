@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { donate } from "@/lib/donate";
 
-/** Вміст донату: «Разово / Щомісяця» → Stripe, банківський переказ, посилання на звіти. */
+/** Вміст донату: «Разово / Щомісяця» → готові суми або своя сума (Stripe Payment Links), банківський переказ, звіти. */
 export default function DonatePanel({
   onNavigate,
   reportsHref,
@@ -45,49 +45,37 @@ export default function DonatePanel({
         <div className="mt-7">
           <p className="leading-relaxed text-ink-soft">
             Будь-яка сума допомагає: суботнім школам, інформаційному центру, культурним подіям і людям,
-            які щойно приїхали. Суму ви вводите на наступному кроці.
+            які щойно приїхали.
           </p>
           <PayButton href={donate.oneTime} onNavigate={onNavigate}>
             Підтримати разово
           </PayButton>
+          <p className="mt-3 text-xs text-mute">Суму ви вводите на наступному кроці.</p>
         </div>
       ) : (
         <div className="mt-7">
           <p className="leading-relaxed text-ink-soft">
-            Регулярний внесок дає змогу планувати роботу наперед. Скасувати можна будь-коли за посиланням
-            у листі від Stripe.
+            Регулярний внесок дає змогу планувати роботу наперед. Скасувати можна будь-коли
+            {donate.manageUrl ? " в особистому кабінеті Stripe" : " за посиланням у листі від Stripe"}.
           </p>
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {donate.monthly.map((m) =>
-              m.url ? (
-                <a
-                  key={m.amount}
-                  href={m.url}
-                  onClick={onNavigate}
-                  className="group flex flex-col items-center justify-center border border-line py-5 transition-colors hover:border-sky-700 hover:bg-sky-deep hover:text-paper"
-                >
-                  <span className="display text-[1.9rem] leading-none">
-                    {m.amount}
-                    <span className="text-lg"> {donate.currency}</span>
-                  </span>
-                  <span className="mt-1 text-xs text-mute group-hover:text-sky-100">на місяць</span>
-                </a>
-              ) : (
-                <span
-                  key={m.amount}
-                  aria-disabled="true"
-                  className="flex cursor-not-allowed flex-col items-center justify-center border border-dashed border-line py-5 text-mute"
-                >
-                  <span className="display text-[1.9rem] leading-none">
-                    {m.amount}
-                    <span className="text-lg"> {donate.currency}</span>
-                  </span>
-                  <span className="mt-1 text-xs">на місяць</span>
-                </span>
-              ),
-            )}
-          </div>
-          {donate.monthly.every((m) => !m.url) && <NotReady />}
+          <AmountGrid
+            items={donate.monthly}
+            suffix="на місяць"
+            customUrl={donate.monthlyCustom}
+            customHint="кількість = сума в € на місяць"
+            onNavigate={onNavigate}
+          />
+          {!donate.monthlyCustom && donate.monthly.every((m) => !m.url) && <NotReady />}
+          {donate.manageUrl && (
+            <a
+              href={donate.manageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-underline mt-5 inline-block text-sm text-sky-700"
+            >
+              Уже підписані? Змінити або скасувати підписку →
+            </a>
+          )}
         </div>
       )}
 
@@ -153,11 +141,67 @@ export default function DonatePanel({
   );
 }
 
+function AmountGrid({
+  items,
+  suffix,
+  customUrl,
+  customHint,
+  onNavigate,
+}: {
+  items: { amount: number; url: string }[];
+  suffix?: string;
+  customUrl: string;
+  customHint: string;
+  onNavigate?: () => void;
+}) {
+  const tile = "flex flex-col items-center justify-center border py-5 transition-colors";
+  const active = `${tile} group border-line hover:border-sky-700 hover:bg-sky-deep hover:text-paper`;
+  const off = `${tile} cursor-not-allowed border-dashed border-line text-mute`;
+  return (
+    <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {items.map((m) => {
+        const body = (
+          <>
+            <span className="display text-[1.9rem] leading-none">
+              {m.amount}
+              <span className="text-lg"> {donate.currency}</span>
+            </span>
+            {suffix && <span className="mt-1 text-xs text-mute group-hover:text-sky-100">{suffix}</span>}
+          </>
+        );
+        return m.url ? (
+          <a key={m.amount} href={m.url} onClick={onNavigate} className={active}>
+            {body}
+          </a>
+        ) : (
+          <span key={m.amount} aria-disabled="true" className={off}>
+            {body}
+          </span>
+        );
+      })}
+      {customUrl ? (
+        <a
+          href={customUrl}
+          onClick={onNavigate}
+          className={`${tile} group col-span-2 border-wheat-400 bg-wheat-400 px-3 text-center text-ink hover:border-sky-deep hover:bg-sky-deep hover:text-paper sm:col-span-1`}
+        >
+          <span className="text-base font-semibold leading-tight">Своя сума</span>
+          <span className="mt-1 text-[11px] leading-tight text-ink/60 group-hover:text-sky-100">{customHint}</span>
+        </a>
+      ) : (
+        <span aria-disabled="true" className={`${off} col-span-2 sm:col-span-1`}>
+          <span className="text-base font-semibold">Своя сума</span>
+        </span>
+      )}
+    </div>
+  );
+}
+
 function PayButton({ href, children, onNavigate }: { href: string; children: React.ReactNode; onNavigate?: () => void }) {
   if (!href)
     return (
       <>
-        <span aria-disabled="true" className="mt-6 inline-flex cursor-not-allowed items-center gap-3 rounded-full bg-wheat-400/50 px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ink/50">
+        <span aria-disabled="true" className="mt-6 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-full bg-wheat-400/50 px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ink/50">
           {children} →
         </span>
         <NotReady />
@@ -167,7 +211,7 @@ function PayButton({ href, children, onNavigate }: { href: string; children: Rea
     <a
       href={href}
       onClick={onNavigate}
-      className="group mt-6 inline-flex items-center gap-3 rounded-full bg-wheat-400 px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-sky-deep hover:text-paper"
+      className="group mt-6 flex w-full items-center justify-center gap-3 rounded-full bg-wheat-400 px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-sky-deep hover:text-paper"
     >
       {children}
       <span className="transition-transform group-hover:translate-x-1">→</span>

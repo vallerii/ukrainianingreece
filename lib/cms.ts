@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { datoRequest } from "./datocms";
 import { dayKey, hueFrom, slugify, TIME_ZONE, yearOf } from "./format";
+import { embedVideos } from "./media";
 
 /* ────────────────────────────────────────────────────────────
  * Типи, з якими працюють сторінки (вже нормалізовані)
@@ -21,6 +22,8 @@ export type Term = { id: string; title: string; slug: string };
 export type Article = {
   id: string;
   slug: string;
+  /** Адреса сторінки: /novyny/<slug> або /blog/<slug> */
+  href: string;
   title: string;
   date: string;
   type: Term | null;
@@ -117,7 +120,8 @@ const term = (t: { id: string; title: string }): Term => ({
  */
 export function toHtml(html: string | null | undefined) {
   if (!html) return "";
-  return html.replace(/([^>\n])\n(?=[^\n])/g, "$1</p>\n<p>").replace(/<p>\s*<\/p>/g, "");
+  // посилання на YouTube окремим рядком → вбудоване відео
+  return embedVideos(html.replace(/([^>\n])\n(?=[^\n])/g, "$1</p>\n<p>").replace(/<p>\s*<\/p>/g, ""));
 }
 
 const hasText = (html: string | null | undefined) =>
@@ -127,6 +131,7 @@ function toArticle(a: RawArticle): Article {
   return {
     id: a.id,
     slug: a.slug,
+    href: `/novyny/${a.slug}`,
     title: a.title,
     date: a._firstPublishedAt,
     type: a.tags ? term(a.tags) : null,
@@ -295,9 +300,13 @@ export const getArticleTypes = cache(async (locale: Locale = "uk") => {
  * Події
  * ──────────────────────────────────────────────────────────── */
 
-/** Прийдешні та ті, що тривають (від найближчих), сторінками. */
+/**
+ * Прийдешні та ті, що тривають, сторінками.
+ * order: "asc" — від найближчих (головна, «Далі в календарі»);
+ *        "desc" — від найдальших (сторінка /podiyi, правка клієнта 22.10.2026).
+ */
 export const getUpcomingEvents = cache(
-  async (page = 1, tagId: string | null = null, size = PAGE_SIZE) => {
+  async (page = 1, tagId: string | null = null, size = PAGE_SIZE, order: "asc" | "desc" = "asc") => {
     const t = todayStart();
     const filter: Filter = {
       // з запасом: усе, що починається або закінчується від початку сьогоднішнього дня;
@@ -307,7 +316,7 @@ export const getUpcomingEvents = cache(
     };
     const data = await datoRequest<{ items: RawEvent[]; meta: { count: number } }>(
       `query Upcoming($first: IntType, $skip: IntType, $filter: EventModelFilter) {
-        items: allEvents(locale: uk, first: $first, skip: $skip, filter: $filter, orderBy: dateStart_ASC) { ${EVENT_FIELDS} }
+        items: allEvents(locale: uk, first: $first, skip: $skip, filter: $filter, orderBy: ${order === "desc" ? "dateStart_DESC" : "dateStart_ASC"}) { ${EVENT_FIELDS} }
         meta: _allEventsMeta(locale: uk, filter: $filter) { count }
       }`,
       { first: size, skip: (page - 1) * size, filter },
