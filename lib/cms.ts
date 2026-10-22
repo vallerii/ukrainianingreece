@@ -341,9 +341,14 @@ export const getRecentPastEvents = cache(async (count: number, tagId: string | n
     `query RecentPast($first: IntType, $filter: EventModelFilter) {
       items: allEvents(locale: uk, first: $first, filter: $filter, orderBy: dateStart_DESC) { ${EVENT_FIELDS} }
     }`,
-    { first: count, filter },
+    { first: count + 5, filter },
   );
-  return data.items.map((e) => toEvent(e));
+  // багатоденні події, що ще тривають (почалися раніше, але не закінчилися), сюди не потрапляють —
+  // вони вже є серед прийдешніх
+  return data.items
+    .map((e) => toEvent(e))
+    .filter((e) => e.status === "past")
+    .slice(0, count);
 });
 
 /** Роки, в які були події, з кількістю (від нових до старих) — для архіву звітів. */
