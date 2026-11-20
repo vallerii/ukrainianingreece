@@ -1,7 +1,8 @@
 "use client";
 
+import { useT } from "@/components/i18n/I18nProvider";
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { donate } from "@/lib/donate";
 
 /** Вміст донату: «Разово / Щомісяця» → готові суми або своя сума (Stripe Payment Links), банківський переказ, звіти. */
@@ -13,6 +14,7 @@ export default function DonatePanel({
   /** null — фінансових звітів ще немає, посилання не показуємо */
   reportsHref?: string | null;
 }) {
+  const t = useT();
   const [mode, setMode] = useState<"once" | "monthly">("once");
   const [copied, setCopied] = useState(false);
   const bank = donate.bank;
@@ -20,11 +22,11 @@ export default function DonatePanel({
   return (
     <div>
       {/* перемикач */}
-      <div role="tablist" aria-label="Тип внеску" className="inline-flex rounded-full bg-paper-dim p-1">
+      <div role="tablist" aria-label={t.donate.type} className="inline-flex rounded-full bg-paper-dim p-1">
         {(
           [
-            ["once", "Разово"],
-            ["monthly", "Щомісяця"],
+            ["once", t.donate.once],
+            ["monthly", t.donate.monthly],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -44,25 +46,24 @@ export default function DonatePanel({
       {mode === "once" ? (
         <div className="mt-7">
           <p className="leading-relaxed text-ink-soft">
-            Будь-яка сума допомагає: суботнім школам, інформаційному центру, культурним подіям і людям,
-            які щойно приїхали.
+            {t.donate.onceLead}
           </p>
           <PayButton href={donate.oneTime} onNavigate={onNavigate}>
-            Підтримати разово
+            {t.donate.onceBtn}
           </PayButton>
-          <p className="mt-3 text-xs text-mute">Суму ви вводите на наступному кроці.</p>
+          <p className="mt-3 text-xs text-mute">{t.donate.onceHint}</p>
         </div>
       ) : (
         <div className="mt-7">
           <p className="leading-relaxed text-ink-soft">
-            Регулярний внесок дає змогу планувати роботу наперед. Скасувати можна будь-коли
-            {donate.manageUrl ? " в особистому кабінеті Stripe" : " за посиланням у листі від Stripe"}.
+            {t.donate.monthlyLead}
+            {donate.manageUrl ? t.donate.monthlyManage : t.donate.monthlyLetter}.
           </p>
           <AmountGrid
             items={donate.monthly}
-            suffix="на місяць"
+            suffix={t.donate.perMonth}
             customUrl={donate.monthlyCustom}
-            customHint="кількість = сума в € на місяць"
+            customHint={t.donate.customHint}
             onNavigate={onNavigate}
           />
           {!donate.monthlyCustom && donate.monthly.every((m) => !m.url) && <NotReady />}
@@ -73,7 +74,7 @@ export default function DonatePanel({
               rel="noopener noreferrer"
               className="link-underline mt-5 inline-block text-sm text-sky-700"
             >
-              Уже підписані? Змінити або скасувати підписку →
+              {t.donate.manage}
             </a>
           )}
         </div>
@@ -84,17 +85,17 @@ export default function DonatePanel({
           <rect x="5" y="11" width="14" height="10" rx="2" />
           <path d="M8 11V7a4 4 0 0 1 8 0v4" />
         </svg>
-        Оплата на захищеній сторінці Stripe: картка, Apple Pay, Google Pay. Дані картки ми не бачимо.
+        {t.donate.secure}
       </p>
 
       {/* банківський переказ */}
       {bank.iban && (
         <div className="mt-8 border-t border-line pt-6">
-          <p className="eyebrow text-mute">Банківський переказ</p>
+          <p className="eyebrow text-mute">{t.donate.bank}</p>
           <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-5 gap-y-1.5 text-sm">
             {bank.recipient && (
               <>
-                <dt className="text-mute">Отримувач</dt>
+                <dt className="text-mute">{t.donate.recipient}</dt>
                 <dd className="text-ink">{bank.recipient}</dd>
               </>
             )}
@@ -109,7 +110,7 @@ export default function DonatePanel({
                 }}
                 className="text-xs font-normal text-sky-700 underline underline-offset-2"
               >
-                {copied ? "Скопійовано" : "Копіювати"}
+                {copied ? t.donate.copied : t.donate.copy}
               </button>
             </dd>
             {bank.bic && (
@@ -120,12 +121,12 @@ export default function DonatePanel({
             )}
             {bank.bank && (
               <>
-                <dt className="text-mute">Банк</dt>
+                <dt className="text-mute">{t.donate.bankName}</dt>
                 <dd className="text-ink">{bank.bank}</dd>
               </>
             )}
-            <dt className="text-mute">Призначення</dt>
-            <dd className="text-ink">{bank.purpose}</dd>
+            <dt className="text-mute">{t.donate.purposeLabel}</dt>
+            <dd className="text-ink">{bank.purpose || t.donate.purpose}</dd>
           </dl>
         </div>
       )}
@@ -133,7 +134,7 @@ export default function DonatePanel({
       {reportsHref && (
         <div className="mt-8 border-t border-line pt-5">
           <Link href={reportsHref} onClick={onNavigate} className="link-underline text-sm font-semibold text-ink">
-            Звіти про використання коштів →
+            {t.donate.reports}
           </Link>
         </div>
       )}
@@ -154,6 +155,7 @@ function AmountGrid({
   customHint: string;
   onNavigate?: () => void;
 }) {
+  const t = useT();
   const tile = "flex flex-col items-center justify-center border py-5 transition-colors";
   const active = `${tile} group border-line hover:border-sky-700 hover:bg-sky-deep hover:text-paper`;
   const off = `${tile} cursor-not-allowed border-dashed border-line text-mute`;
@@ -185,12 +187,12 @@ function AmountGrid({
           onClick={onNavigate}
           className={`${tile} group col-span-2 border-wheat-400 bg-wheat-400 px-3 text-center text-ink hover:border-sky-deep hover:bg-sky-deep hover:text-paper sm:col-span-1`}
         >
-          <span className="text-base font-semibold leading-tight">Своя сума</span>
+          <span className="text-base font-semibold leading-tight">{t.donate.custom}</span>
           <span className="mt-1 text-[11px] leading-tight text-ink/60 group-hover:text-sky-100">{customHint}</span>
         </a>
       ) : (
         <span aria-disabled="true" className={`${off} col-span-2 sm:col-span-1`}>
-          <span className="text-base font-semibold">Своя сума</span>
+          <span className="text-base font-semibold">{t.donate.custom}</span>
         </span>
       )}
     </div>
@@ -220,5 +222,5 @@ function PayButton({ href, children, onNavigate }: { href: string; children: Rea
 }
 
 function NotReady() {
-  return <p className="mt-3 text-xs text-wheat-700">Оплату ще не підключено: потрібні посилання Stripe (lib/donate.ts).</p>;
+  return <p className="mt-3 text-xs text-wheat-700">{useT().donate.notReady}</p>;
 }

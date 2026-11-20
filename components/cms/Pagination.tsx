@@ -1,9 +1,11 @@
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 
 /**
  * Пагінація в редакційному стилі: «← Попередня · 1 2 … 7 · Наступна →».
  * Посилання зберігають поточні фільтри (params), сторінка 1 — без ?page.
  */
+import { getT } from "@/lib/i18n/server";
+
 export default function Pagination({
   page,
   pages,
@@ -35,13 +37,13 @@ export default function Pagination({
   const edge = "inline-flex items-center gap-2 text-sm font-semibold text-ink";
 
   return (
-    <nav aria-label="Сторінки" className="flex flex-wrap items-center justify-between gap-6 pt-12">
+    <nav aria-label={getT().pagination.label} className="flex flex-wrap items-center justify-between gap-6 pt-12">
       {page > 1 ? (
         <Link href={href(page - 1)} className={`${edge} link-underline group`}>
-          <span className="transition-transform group-hover:-translate-x-1">←</span> Попередня
+          <span className="transition-transform group-hover:-translate-x-1">←</span> {getT().pagination.prev}
         </Link>
       ) : (
-        <span className={`${edge} opacity-30`}>← Попередня</span>
+        <span className={`${edge} opacity-30`}>← {getT().pagination.prev}</span>
       )}
 
       <ul className="flex items-center gap-1">
@@ -68,10 +70,10 @@ export default function Pagination({
 
       {page < pages ? (
         <Link href={href(page + 1)} className={`${edge} link-underline group`}>
-          Наступна <span className="transition-transform group-hover:translate-x-1">→</span>
+          {getT().pagination.next} <span className="transition-transform group-hover:translate-x-1">→</span>
         </Link>
       ) : (
-        <span className={`${edge} opacity-30`}>Наступна →</span>
+        <span className={`${edge} opacity-30`}>{getT().pagination.next} →</span>
       )}
     </nav>
   );

@@ -1,4 +1,6 @@
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
+
+import { getT } from "@/lib/i18n/server";
 
 export default function Placeholder({
   eyebrow,
@@ -21,13 +23,13 @@ export default function Placeholder({
         <div className="rule mt-10" />
         <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">{text}</p>
         <p className="mt-10 text-sm text-mute">
-          Сторінка в розробці — структура готова, контент наповнюємо.
+          {getT().placeholder.text}
         </p>
         <Link
           href="/"
           className="link-underline mt-8 inline-block text-sm font-bold text-ink"
         >
-          ← На головну
+          {getT().common.home}
         </Link>
       </div>
     </section>

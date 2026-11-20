@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 
 export type FilterOption = { label: string; href: string; active: boolean; count?: number };
 

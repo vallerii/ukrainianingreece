@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { OrgLogo } from "@/lib/organizations";
+import { getT } from "@/lib/i18n/server";
 
 /** Логотип організації на підкладці (світлій або фірмовій темній). */
 export default function ProjectLogo({
@@ -18,7 +19,7 @@ export default function ProjectLogo({
     >
       <Image
         src={logo.src}
-        alt={`Логотип: ${title}`}
+        alt={`${getT().founders.logo} ${title}`}
         width={logo.width}
         height={logo.height}
         sizes="20rem"

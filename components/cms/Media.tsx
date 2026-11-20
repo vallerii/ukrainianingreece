@@ -4,6 +4,8 @@ import { fileSize, hasMedia, type Media as MediaData } from "@/lib/media";
  * Відео (YouTube) і файли для завантаження під текстом.
  * Дані — поля «Videos» і «Files» у DatoCMS (див. lib/media.ts).
  */
+import { getLocale, getT } from "@/lib/i18n/server";
+
 export default function Media({
   media,
   className = "",
@@ -21,14 +23,14 @@ export default function Media({
     <div className={`max-w-[44rem] space-y-12 ${className}`}>
       {media.videos.length > 0 && (
         <div>
-          <p className="eyebrow text-mute">Відео</p>
+          <p className="eyebrow text-mute">{getT().media.video}</p>
           <div className="rule mt-3" />
           <div className="mt-6 space-y-6">
             {media.videos.map((v) => (
               <div key={v.id} className="video-embed">
                 <iframe
                   src={v.embed}
-                  title="Відео YouTube"
+                  title={getT().media.videoTitle}
                   loading="lazy"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
@@ -42,7 +44,7 @@ export default function Media({
 
       {media.files.length > 0 && (
         <div>
-          <p className="eyebrow text-mute">Матеріали для завантаження</p>
+          <p className="eyebrow text-mute">{getT().media.files}</p>
           <div className="rule mt-3" />
           <ul className="mt-4 space-y-3">
             {media.files.map((f) => (
@@ -63,7 +65,7 @@ export default function Media({
                     </span>
                     <span className="mt-0.5 block text-xs text-mute group-hover:text-sky-100">
                       {f.ext ? `${f.ext} · ` : ""}
-                      {fileSize(f.size)}
+                      {fileSize(f.size, getLocale())}
                     </span>
                   </span>
                   <svg

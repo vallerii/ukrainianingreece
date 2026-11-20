@@ -6,6 +6,8 @@
  * з Project settings → API tokens). Лежить у .env.local, у git не потрапляє.
  */
 
+import { getLocale } from "./i18n/server";
+
 const ENDPOINT = "https://graphql.datocms.com/";
 
 /** Як часто перечитувати контент з CMS (секунди). */
@@ -15,6 +17,9 @@ export async function datoRequest<T>(
   query: string,
   variables: Record<string, unknown> = {},
 ): Promise<T> {
+  // «locale: CUR» у запиті → мова поточної сторінки з запасним варіантом — українською
+  const loc = getLocale();
+  query = query.replace(/locale: CURM\b/g, `locale: ${loc}`).replace(/locale: CUR\b/g, loc === "uk" ? "locale: uk" : `locale: ${loc}, fallbackLocales: [uk]`);
   const token = process.env.DATOCMS_API_TOKEN;
   if (!token) {
     throw new Error(

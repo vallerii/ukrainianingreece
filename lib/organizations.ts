@@ -15,6 +15,8 @@ import { cache } from "react";
 import { datoRequest } from "./datocms";
 import { toHtml } from "./cms";
 import { satellites } from "./projects";
+import { getLocale, getT } from "./i18n/server";
+import type { Locale } from "./i18n/config";
 
 export type OrgLogo = { src: string; width: number; height: number; dark?: boolean };
 
@@ -86,8 +88,8 @@ function parseFacts(text: string | null, year: number | null, head: string | nul
   if (lines.length) return lines;
   // фактів не задано — збираємо з окремих полів (напр. для заявок із форми)
   return [
-    ...(year ? [{ label: "Засновано", value: String(year) }] : []),
-    ...(head ? [{ label: "Керівник", value: head }] : []),
+    ...(year ? [{ label: getT().org.founded, value: String(year) }] : []),
+    ...(head ? [{ label: getT().org.head, value: head }] : []),
   ];
 }
 
@@ -103,7 +105,7 @@ function fromCms(o: RawOrg, i: number): Org {
     title: o.name,
     navLabel: o.shortName || o.name,
     note: o.menuNote || o.city || "",
-    city: o.city || "Греція",
+    city: o.city || getT().org.greece,
     summary: o.summary || "",
     subtitle: o.subtitle,
     logo: o.logo
@@ -169,11 +171,13 @@ function fromStatic(): Org[] {
   }));
 }
 
-export const getOrganizations = cache(async (): Promise<Org[]> => {
+// locale можна передати явно — для OG-картинок (там немає мови запиту)
+export const getOrganizations = cache(async (locale: Locale = getLocale()): Promise<Org[]> => {
+  const loc = locale === "uk" ? "locale: uk" : `locale: ${locale}, fallbackLocales: [uk]`;
   try {
     const data = await datoRequest<{ items: RawOrg[] }>(
       `query Organizations {
-        items: allOrganizations(first: 100, orderBy: position_ASC) {
+        items: allOrganizations(${loc}, first: 100, orderBy: position_ASC) {
           slug name shortName menuNote subtitle city summary content(markdown: true) facts
           foundedYear head logo { url width height } logoDark
           website facebook instagram phone email address isFounder isPartner projectPosition
@@ -182,7 +186,7 @@ export const getOrganizations = cache(async (): Promise<Org[]> => {
     );
     if (data.items.length > 0) {
       const orgs = data.items.map(fromCms);
-      const galleries = await getGalleries();
+      const galleries = await getGalleries(loc);
       return orgs.map((o) => ({ ...o, gallery: galleries[o.slug] ?? [] }));
     }
   } catch {
@@ -196,13 +200,13 @@ export const getOrganizations = cache(async (): Promise<Org[]> => {
  * Галереї — окремим запитом: якщо поле «gallery» ще не додано в модель
  * (не запущено scripts/datocms-setup.mjs), решта даних організацій однаково працює.
  */
-async function getGalleries(): Promise<Record<string, GalleryImage[]>> {
+async function getGalleries(loc: string): Promise<Record<string, GalleryImage[]>> {
   try {
     const data = await datoRequest<{
       items: { slug: string; gallery: { url: string; width: number | null; height: number | null; alt: string | null; title: string | null }[] }[];
     }>(
       `query OrganizationGalleries {
-        items: allOrganizations(first: 100) { slug gallery { url width height alt title } }
+        items: allOrganizations(${loc}, first: 100) { slug gallery { url width height alt title } }
       }`,
     );
     return Object.fromEntries(
@@ -221,8 +225,8 @@ async function getGalleries(): Promise<Record<string, GalleryImage[]>> {
   }
 }
 
-export async function getOrganization(slug: string) {
-  return (await getOrganizations()).find((o) => o.slug === slug) ?? null;
+export async function getOrganization(slug: string, locale?: Locale) {
+  return (await getOrganizations(locale)).find((o) => o.slug === slug) ?? null;
 }
 
 /* ── похідні ───────────────────────────────────────────────── */
@@ -236,7 +240,7 @@ export type Founder = {
   href: string;
   hue: number;
   logo: OrgLogo | null;
-  role: "Засновник" | "Партнер";
+  role: "founder" | "partner";
 };
 
 /** Мережа: спершу засновники, далі партнери (кожні — у порядку DatoCMS). */
@@ -248,7 +252,7 @@ export const toNetwork = (orgs: Org[]): Founder[] =>
     href: `/proyekty/${o.slug}`,
     hue: FOUNDER_HUES[i % FOUNDER_HUES.length],
     logo: o.logo,
-    role: o.founder ? "Засновник" : "Партнер",
+    role: o.founder ? "founder" : "partner",
   }));
 
 /** Постійні проєкти — у порядку project_position. */

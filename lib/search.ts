@@ -11,13 +11,21 @@
  */
 import { searchCms, type Article, type CmsEvent } from "./cms";
 import { getOrganizations, type Org } from "./organizations";
-import { goals, geography, team, timeline, values } from "./about";
 import { site } from "./site";
-import { topics } from "./korysno";
+import { getTopics } from "./korysno";
+import { getT } from "./i18n/server";
 
 export const MIN_QUERY = 2;
 
-const norm = (s: string) => s.toLowerCase().replace(/[’ʼ`']/g, "'").replace(/ё/g, "е");
+// у грецькій прибираємо наголоси (ά → α), щоб «Κρήτη» знаходилось за «κρητη»
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[’ʼ`']/g, "'")
+    .replace(/ё/g, "е")
+    .normalize("NFD")
+    .replace(/([\u0370-\u03ff\u1f00-\u1fff])[\u0300-\u036f]+/g, "$1")
+    .normalize("NFC");
 
 /** Груба «основа» слова: прибираємо 1–2 останні літери (закінчення). */
 function stem(word: string) {
@@ -96,76 +104,55 @@ const orgText = (o: Org) =>
     .join(" ");
 
 // функція, а не константа: lib/korysno ↔ lib/search імпортують одне одного
-const staticDocs = (orgs: Org[]): StaticDoc[] => [
-  ...orgs.map((o) => ({
-    title: o.title,
-    href: `/proyekty/${o.slug}`,
-    section: `Проєкт ${o.n} · ${o.city}`,
-    text: orgText(o),
-  })),
-  {
-    title: "Хто ми є",
-    href: "/pro-nas#opys",
-    section: "Про нас",
-    text:
-      "Об’єднана українська діаспора в Греції — мережа українських організацій, шкіл, клубів та ініціатив. Місія, візія, цінності. " +
-      values.map((v) => `${v.k}. ${v.v}`).join(" "),
-  },
-  {
-    title: "Цілі",
-    href: "/pro-nas#tsili",
-    section: "Про нас",
-    text: goals.map((g) => `${g.title}. ${g.text}`).join(" "),
-  },
-  {
-    title: "Історія",
-    href: "/pro-nas#istoriya",
-    section: "Про нас",
-    text: timeline.map((t) => `${t.title}. ${t.text}`).join(" "),
-  },
-  {
-    title: "Географія",
-    href: "/pro-nas#geografiya",
-    section: "Про нас",
-    text: geography.map((g) => `${g.city} — ${g.role}. ${g.text}`).join(" "),
-  },
-  {
-    title: "Команда",
-    href: "/pro-nas#komanda",
-    section: "Про нас",
-    text: team.map((t) => `${t.role}: ${t.area}`).join(". "),
-  },
-  {
-    title: "Корисна інформація",
-    href: "/korysno",
-    section: "Довідник",
-    text: "Довідник: " + topics.map((t) => t.title).join(", "),
-  },
-  ...topics.map((t) => ({
-    title: t.title,
-    href: `/korysno/${t.slug}`,
-    section: "Корисна інформація",
-    text: `${t.lead} ${t.links.map((l) => l.label).join(". ")}`,
-  })),
-  {
-    title: "Контакти",
-    href: "/kontakty",
-    section: "Сторінка",
-    text: `Звʼязатися з нами. ${site.email}, ${site.phone}, ${site.address}. ${site.cities.join(", ")}.`,
-  },
-  {
-    title: "Блог",
-    href: "/blog",
-    section: "Сторінка",
-    text: "Блог: статті на загальні теми — життя в Греції, культура, історія, освіта, думки й розповіді людей спільноти.",
-  },
-  {
-    title: "Підтримати",
-    href: "/pidtrymaty",
-    section: "Сторінка",
-    text: "Донат, волонтерство, партнерство. Підтримати спільноту.",
-  },
-];
+const staticDocs = (orgs: Org[]): StaticDoc[] => {
+  const t = getT();
+  const x = t.searchIndex;
+  const { goals, geography, team, timeline, values } = t.about;
+  const topics = getTopics();
+  return [
+    ...orgs.map((o) => ({
+      title: o.title,
+      href: `/proyekty/${o.slug}`,
+      section: `${x.project} ${o.n} · ${o.city}`,
+      text: orgText(o),
+    })),
+    {
+      title: t.nav.who,
+      href: "/pro-nas#opys",
+      section: t.nav.about,
+      text: `${x.whoText} ` + values.map((v) => `${v.k}. ${v.v}`).join(" "),
+    },
+    { title: t.nav.goals, href: "/pro-nas#tsili", section: t.nav.about, text: goals.map((g) => `${g.title}. ${g.text}`).join(" ") },
+    { title: t.nav.history, href: "/pro-nas#istoriya", section: t.nav.about, text: timeline.map((i) => `${i.title}. ${i.text}`).join(" ") },
+    {
+      title: t.nav.geo,
+      href: "/pro-nas#geografiya",
+      section: t.nav.about,
+      text: geography.map((g) => `${g.city} — ${g.role}. ${g.text}`).join(" "),
+    },
+    { title: t.nav.team, href: "/pro-nas#komanda", section: t.nav.about, text: team.map((m) => `${m.role}: ${m.area}`).join(". ") },
+    {
+      title: t.usefulPage.metaTitle,
+      href: "/korysno",
+      section: x.guide,
+      text: `${x.guide}: ` + topics.map((i) => i.title).join(", "),
+    },
+    ...topics.map((i) => ({
+      title: i.title,
+      href: `/korysno/${i.slug}`,
+      section: t.usefulPage.metaTitle,
+      text: `${i.lead} ${i.links.map((l) => l.label).join(". ")}`,
+    })),
+    {
+      title: t.nav.contacts,
+      href: "/kontakty",
+      section: x.page,
+      text: `${x.contactsText} ${site.email}, ${site.phone}, ${t.site.address}. ${t.site.cities.join(", ")}.`,
+    },
+    { title: t.nav.blog, href: "/blog", section: x.page, text: x.blogText },
+    { title: t.footer.support, href: "/pidtrymaty", section: x.page, text: x.supportText },
+  ];
+};
 
 function searchStatic(terms: string[], orgs: Org[]) {
   return staticDocs(orgs)

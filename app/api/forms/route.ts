@@ -65,13 +65,16 @@ export async function POST(req: Request) {
       if (!name || !contactName || !isEmail(contactEmail) || !city || !summary)
         return NextResponse.json({ ok: false, error: "validation" }, { status: 400 });
       const year = Number(str(body.founded_year, 4));
+      // назва, місто й опис у моделі organization перекладні (uk / en / el):
+      // заявка приходить однією мовою — кладемо текст в усі мови, редактор потім перекладе
+      const all = (v: string) => ({ uk: v, en: v, el: v });
       await createRecord(FORM_MODELS.organization, {
-        name,
+        name: all(name),
         // унікальний slug: назва + короткий хвіст, редактор може змінити перед публікацією
         slug: `${slugify(name) || "organization"}-${Date.now().toString(36).slice(-4)}`,
-        city,
+        city: all(city),
         founded_year: Number.isInteger(year) && year > 1900 && year <= new Date().getFullYear() ? year : null,
-        summary,
+        summary: all(summary),
         website: str(body.website, 300) || null,
         contact_name: contactName,
         contact_email: contactEmail,

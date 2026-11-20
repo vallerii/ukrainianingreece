@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useT } from "@/components/i18n/I18nProvider";
+import { fill } from "@/lib/i18n/fill";
 
 export type GalleryItem = { src: string; width: number; height: number; alt: string };
 
@@ -11,7 +13,7 @@ export type GalleryItem = { src: string; width: number; height: number; alt: str
  */
 export default function Gallery({
   images,
-  title = "Фото",
+  title,
   initial = 9,
 }: {
   images: GalleryItem[];
@@ -19,6 +21,7 @@ export default function Gallery({
   /** Скільки фото показати до кнопки «Показати всі» */
   initial?: number;
 }) {
+  const t = useT();
   const [open, setOpen] = useState<number | null>(null);
   const [all, setAll] = useState(images.length <= initial + 2);
   const shown = all ? images : images.slice(0, initial);
@@ -27,14 +30,14 @@ export default function Gallery({
 
   return (
     <>
-      <ul className="columns-2 gap-3 md:columns-3 md:gap-4" aria-label={title}>
+      <ul className="columns-2 gap-3 md:columns-3 md:gap-4" aria-label={title ?? t.gallery.title}>
         {shown.map((img, i) => (
           <li key={img.src} className="mb-3 break-inside-avoid md:mb-4">
             <button
               type="button"
               onClick={() => setOpen(i)}
               className="group relative block w-full overflow-hidden bg-paper-dim"
-              aria-label={`Відкрити фото ${i + 1} з ${images.length}${img.alt ? `: ${img.alt}` : ""}`}
+              aria-label={`${fill(t.gallery.open, { i: i + 1, n: images.length })}${img.alt ? `: ${img.alt}` : ""}`}
             >
               <Image
                 src={img.src}
@@ -55,7 +58,7 @@ export default function Gallery({
           onClick={() => setAll(true)}
           className="mt-6 inline-flex items-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-bold text-ink transition-colors hover:border-ink"
         >
-          Показати всі {images.length} фото
+          {fill(t.gallery.showAll, { n: images.length })}
         </button>
       )}
 
@@ -75,6 +78,7 @@ function Lightbox({
   onIndex: (i: number) => void;
   onClose: () => void;
 }) {
+  const t = useT();
   const closeRef = useRef<HTMLButtonElement>(null);
   const touchX = useRef<number | null>(null);
   const n = images.length;
@@ -107,7 +111,7 @@ function Lightbox({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Фото ${index + 1} з ${n}`}
+      aria-label={fill(t.gallery.photo, { i: index + 1, n })}
       className="fixed inset-0 z-[200] flex flex-col bg-[#05090f] text-paper"
       onClick={(e) => e.target === e.currentTarget && onClose()}
       onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
@@ -127,7 +131,7 @@ function Lightbox({
           type="button"
           onClick={onClose}
           className="flex h-11 w-11 items-center justify-center rounded-full text-2xl transition-colors hover:bg-white/10"
-          aria-label="Закрити"
+          aria-label={t.common.close}
         >
           ×
         </button>
@@ -151,7 +155,7 @@ function Lightbox({
               type="button"
               onClick={() => go(-1)}
               className="absolute left-2 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-2xl transition-colors hover:bg-white/20 md:flex"
-              aria-label="Попереднє фото"
+              aria-label={t.gallery.prev}
             >
               ←
             </button>
@@ -159,7 +163,7 @@ function Lightbox({
               type="button"
               onClick={() => go(1)}
               className="absolute right-2 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-2xl transition-colors hover:bg-white/20 md:flex"
-              aria-label="Наступне фото"
+              aria-label={t.gallery.next}
             >
               →
             </button>
@@ -171,10 +175,10 @@ function Lightbox({
         <p className="text-sm leading-snug text-sky-100/80">{img.alt}</p>
         {n > 1 && (
           <div className="flex shrink-0 gap-2 md:hidden">
-            <button type="button" onClick={() => go(-1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl" aria-label="Попереднє фото">
+            <button type="button" onClick={() => go(-1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl" aria-label={t.gallery.prev}>
               ←
             </button>
-            <button type="button" onClick={() => go(1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl" aria-label="Наступне фото">
+            <button type="button" onClick={() => go(1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl" aria-label={t.gallery.next}>
               →
             </button>
           </div>

@@ -1,13 +1,14 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import Reveal from "./Reveal";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export default function SectionHead({
   eyebrow,
   title,
   link,
-  linkLabel = "Дивитися все",
+  linkLabel,
   tone = "light",
 }: {
   eyebrow: string;
@@ -16,6 +17,7 @@ export default function SectionHead({
   linkLabel?: string;
   tone?: "light" | "dark";
 }) {
+  const t = useT();
   const dark = tone === "dark";
   return (
     <Reveal>
@@ -37,7 +39,7 @@ export default function SectionHead({
               dark ? "text-paper" : "text-ink"
             }`}
           >
-            {linkLabel}
+            {linkLabel ?? t.common.seeAll}
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </Link>
         )}

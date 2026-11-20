@@ -7,7 +7,9 @@ import { embedVideos } from "./media";
  * Типи, з якими працюють сторінки (вже нормалізовані)
  * ──────────────────────────────────────────────────────────── */
 
-export type Locale = "uk" | "en" | "el";
+export type { Locale } from "./i18n/config";
+import type { Locale } from "./i18n/config";
+import { getLocale } from "./i18n/server";
 
 export type CmsImage = {
   url: string;
@@ -209,11 +211,11 @@ async function fetchAll<T>(
   for (let skip = 0; ; skip += CHUNK) {
     const data = await datoRequest<{ items: T[] }>(
       `query All($skip: IntType, $filter: ${opts.filterType}, $locale: SiteLocale) {
-        items: ${collection}(locale: $locale, first: ${CHUNK}, skip: $skip, filter: $filter${
+        items: ${collection}(locale: $locale, fallbackLocales: [uk], first: ${CHUNK}, skip: $skip, filter: $filter${
           opts.orderBy ? `, orderBy: ${opts.orderBy}` : ""
         }) { ${fields} }
       }`,
-      { skip, filter: opts.filter ?? {}, locale: opts.locale ?? "uk" },
+      { skip, filter: opts.filter ?? {}, locale: opts.locale ?? getLocale() },
     );
     out.push(...data.items);
     if (data.items.length < CHUNK) return out;
@@ -232,12 +234,14 @@ async function fetchAll<T>(
  */
 export type Section = "news" | "blog";
 
-export const isBlogType = (title: string | null | undefined) => !!title && /^(стат|блог)/i.test(title.trim());
+// назва типу може прийти будь-якою мовою сайту
+export const isBlogType = (title: string | null | undefined) =>
+  !!title && /^(стат|блог|article|blog|άρθρ|ιστολόγ)/i.test(title.trim());
 
 /** ID типів матеріалу, що належать Блогу. */
 const getBlogTypeIds = cache(async () => {
   const data = await datoRequest<{ items: { id: string; title: string }[] }>(
-    `query BlogTypes { items: allArticleTypes(first: ${CHUNK}) { id title } }`,
+    `query BlogTypes { items: allArticleTypes(locale: uk, first: ${CHUNK}) { id title } }`,
   );
   return data.items.filter((t) => isBlogType(t.title)).map((t) => t.id);
 });
@@ -262,8 +266,8 @@ export const getArticlesPage = cache(
     const filter = and(sec, typeId ? { tags: { eq: typeId } } : {});
     const data = await datoRequest<{ items: RawArticle[]; meta: { count: number } }>(
       `query ArticlesPage($first: IntType, $skip: IntType, $filter: ArticleModelFilter) {
-        items: allArticles(locale: uk, first: $first, skip: $skip, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
-        meta: _allArticlesMeta(locale: uk, filter: $filter) { count }
+        items: allArticles(locale: CUR, first: $first, skip: $skip, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
+        meta: _allArticlesMeta(locale: CURM, filter: $filter) { count }
       }`,
       { first: size, skip: (page - 1) * size, filter },
     );
@@ -288,7 +292,7 @@ export const getLatestArticles = cache(
     );
     const data = await datoRequest<{ items: RawArticle[] }>(
       `query Latest($first: IntType, $filter: ArticleModelFilter) {
-        items: allArticles(locale: uk, first: $first, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
+        items: allArticles(locale: CUR, first: $first, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
       }`,
       { first: count, filter },
     );
@@ -296,10 +300,10 @@ export const getLatestArticles = cache(
   },
 );
 
-export const getArticle = cache(async (slug: string, locale: Locale = "uk") => {
+export const getArticle = cache(async (slug: string, locale: Locale = getLocale()) => {
   const data = await datoRequest<{ article: RawArticle | null }>(
     `query Article($slug: String, $locale: SiteLocale) {
-      article(locale: $locale, filter: { slug: { eq: $slug } }) { ${ARTICLE_FIELDS} }
+      article(locale: $locale, fallbackLocales: [uk], filter: { slug: { eq: $slug } }) { ${ARTICLE_FIELDS} }
     }`,
     { slug, locale },
   );
@@ -316,10 +320,10 @@ export const getArticleSlugs = cache(async () =>
 );
 
 /** Типи матеріалів Новин (без типів Блогу) разом із кількістю матеріалів кожного типу. */
-export const getArticleTypes = cache(async (locale: Locale = "uk") => {
+export const getArticleTypes = cache(async (locale: Locale = getLocale()) => {
   const data = await datoRequest<{ allArticleTypes: { id: string; title: string }[] }>(
     `query ArticleTypes($locale: SiteLocale) {
-      allArticleTypes(locale: $locale, first: ${CHUNK}) { id title }
+      allArticleTypes(locale: $locale, fallbackLocales: [uk], first: ${CHUNK}) { id title }
     }`,
     { locale },
   );
@@ -358,8 +362,8 @@ export const getUpcomingEvents = cache(
     };
     const data = await datoRequest<{ items: RawEvent[]; meta: { count: number } }>(
       `query Upcoming($first: IntType, $skip: IntType, $filter: EventModelFilter) {
-        items: allEvents(locale: uk, first: $first, skip: $skip, filter: $filter, orderBy: ${order === "desc" ? "dateStart_DESC" : "dateStart_ASC"}) { ${EVENT_FIELDS} }
-        meta: _allEventsMeta(locale: uk, filter: $filter) { count }
+        items: allEvents(locale: CUR, first: $first, skip: $skip, filter: $filter, orderBy: ${order === "desc" ? "dateStart_DESC" : "dateStart_ASC"}) { ${EVENT_FIELDS} }
+        meta: _allEventsMeta(locale: CURM, filter: $filter) { count }
       }`,
       { first: size, skip: (page - 1) * size, filter },
     );
@@ -381,7 +385,7 @@ export const getRecentPastEvents = cache(async (count: number, tagId: string | n
   };
   const data = await datoRequest<{ items: RawEvent[] }>(
     `query RecentPast($first: IntType, $filter: EventModelFilter) {
-      items: allEvents(locale: uk, first: $first, filter: $filter, orderBy: dateStart_DESC) { ${EVENT_FIELDS} }
+      items: allEvents(locale: CUR, first: $first, filter: $filter, orderBy: dateStart_DESC) { ${EVENT_FIELDS} }
     }`,
     { first: count + 5, filter },
   );
@@ -421,10 +425,10 @@ export const getArchiveYear = cache(async (year: number) => {
   return items.map((e) => toEvent(e));
 });
 
-export const getEvent = cache(async (slug: string, locale: Locale = "uk") => {
+export const getEvent = cache(async (slug: string, locale: Locale = getLocale()) => {
   const data = await datoRequest<{ event: RawEvent | null }>(
     `query Event($slug: String, $locale: SiteLocale) {
-      event(locale: $locale, filter: { slug: { eq: $slug } }) { ${EVENT_FIELDS} }
+      event(locale: $locale, fallbackLocales: [uk], filter: { slug: { eq: $slug } }) { ${EVENT_FIELDS} }
     }`,
     { slug, locale },
   );
@@ -435,21 +439,16 @@ export const getEventSlugs = cache(async () =>
   fetchAll<{ slug: string }>("allEvents", "slug", { filterType: "EventModelFilter" }),
 );
 
-export const getTags = cache(async (locale: Locale = "uk"): Promise<Term[]> => {
+export const getTags = cache(async (locale: Locale = getLocale()): Promise<Term[]> => {
   const data = await datoRequest<{ allTags: { id: string; title: string }[] }>(
     `query Tags($locale: SiteLocale) {
-      allTags(locale: $locale, first: ${CHUNK}) { id title }
+      allTags(locale: $locale, fallbackLocales: [uk], first: ${CHUNK}) { id title }
     }`,
     { locale },
   );
   return data.allTags.map(term);
 });
 
-export const statusLabel: Record<EventStatus, string> = {
-  upcoming: "Скоро",
-  ongoing: "Триває зараз",
-  past: "Відбулася",
-};
 
 /* ────────────────────────────────────────────────────────────
  * Пошук (див. lib/search.ts)
@@ -470,8 +469,8 @@ export const searchCms = cache(async (terms: string[]) => {
   };
   const data = await datoRequest<{ a: RawArticle[]; e: RawEvent[] }>(
     `query Search($af: ArticleModelFilter, $ef: EventModelFilter) {
-      a: allArticles(locale: uk, first: 30, filter: $af, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
-      e: allEvents(locale: uk, first: 30, filter: $ef, orderBy: dateStart_DESC) { ${EVENT_FIELDS} }
+      a: allArticles(locale: CUR, first: 30, filter: $af, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
+      e: allEvents(locale: CUR, first: 30, filter: $ef, orderBy: dateStart_DESC) { ${EVENT_FIELDS} }
     }`,
     { af, ef },
   );
@@ -486,7 +485,7 @@ export const getArticlesByKeywords = cache(async (keywords: string[], first = 50
   const filter = { OR: keywords.flatMap((k) => [{ title: m(k) }, { content: m(k) }]) };
   const data = await datoRequest<{ items: RawArticle[] }>(
     `query ByKeywords($first: IntType, $filter: ArticleModelFilter) {
-      items: allArticles(locale: uk, first: $first, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
+      items: allArticles(locale: CUR, first: $first, filter: $filter, orderBy: _firstPublishedAt_DESC) { ${ARTICLE_FIELDS} }
     }`,
     { first, filter },
   );
@@ -518,7 +517,7 @@ export const getFinancialReports = cache(async (): Promise<FinancialReport[]> =>
       items: (Omit<FinancialReport, "html"> & { summary: string | null })[];
     }>(
       `query FinancialReports {
-        items: allFinancialReports(first: 100, orderBy: year_DESC) {
+        items: allFinancialReports(locale: CUR, first: 100, orderBy: year_DESC) {
           id title year summary(markdown: true) income expenses
           file { url filename size }
         }

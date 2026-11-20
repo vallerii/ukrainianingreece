@@ -1,3 +1,4 @@
+import type { Locale } from "./i18n/config";
 /**
  * Файли та відео до текстів (правка клієнта 22.10.2026).
  *
@@ -63,7 +64,7 @@ export function parseVideos(text: string | null | undefined): Video[] {
 }
 
 const iframe = (id: string) =>
-  `<div class="video-embed"><iframe src="${embedUrl(id)}" title="Відео YouTube" loading="lazy" ` +
+  `<div class="video-embed"><iframe src="${embedUrl(id)}" title="YouTube" loading="lazy" ` +
   `allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ` +
   `referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`;
 
@@ -116,5 +117,8 @@ export const getMedia = cache(
   },
 );
 
-export const fileSize = (b: number) =>
-  b >= 1e6 ? `${(b / 1e6).toFixed(1).replace(".", ",")} МБ` : `${Math.max(1, Math.round(b / 1e3))} КБ`;
+export const fileSize = (b: number, locale: Locale = "uk") => {
+  const [mb, kb, comma] = { uk: ["МБ", "КБ", true], en: ["MB", "KB", false], el: ["MB", "KB", true] }[locale] as [string, string, boolean];
+  const v = (b / 1e6).toFixed(1);
+  return b >= 1e6 ? `${comma ? v.replace(".", ",") : v} ${mb}` : `${Math.max(1, Math.round(b / 1e3))} ${kb}`;
+};

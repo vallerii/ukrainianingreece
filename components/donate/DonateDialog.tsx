@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/components/i18n/I18nProvider";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import DonatePanel from "./DonatePanel";
@@ -10,6 +11,7 @@ export const openDonate = () => window.dispatchEvent(new Event(OPEN_DONATE));
 
 /** Попап донату. Монтується один раз у layout. */
 export default function DonateDialog({ reportsHref = null }: { reportsHref?: string | null }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
@@ -44,7 +46,7 @@ export default function DonateDialog({ reportsHref = null }: { reportsHref?: str
           exit={{ opacity: 0 }}
         >
           <button
-            aria-label="Закрити"
+            aria-label={t.common.close}
             onClick={() => setOpen(false)}
             className="absolute inset-0 bg-ink/55 backdrop-blur-[2px]"
           />
@@ -61,16 +63,16 @@ export default function DonateDialog({ reportsHref = null }: { reportsHref?: str
           >
             <button
               onClick={() => setOpen(false)}
-              aria-label="Закрити"
+              aria-label={t.common.close}
               className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full text-mute transition-colors hover:bg-paper-dim hover:text-ink"
             >
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
               </svg>
             </button>
-            <p className="eyebrow text-sky-700">Підтримати</p>
+            <p className="eyebrow text-sky-700">{t.donate.eyebrow}</p>
             <h2 id="donate-title" className="display mt-3 pr-10 text-[clamp(1.44rem,3.2vw,2.08rem)] text-ink">
-              Разом ми можемо більше
+              {t.donate.title}
             </h2>
             <div className="mt-7">
               <DonatePanel onNavigate={() => setOpen(false)} reportsHref={reportsHref} />

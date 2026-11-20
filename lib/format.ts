@@ -1,13 +1,22 @@
+import { localeMeta, type Locale } from "./i18n/config";
+
 /** Дати показуємо за часом Афін — незалежно від того, де стоїть сервер. */
 export const TIME_ZONE = "Europe/Athens";
-const LOCALE = "uk-UA";
 
-const fmt = (opts: Intl.DateTimeFormatOptions) =>
-  new Intl.DateTimeFormat(LOCALE, { timeZone: TIME_ZONE, ...opts });
+const cacheFmt = new Map<string, Intl.DateTimeFormat>();
+const fmt = (locale: Locale, name: string, opts: Intl.DateTimeFormatOptions) => {
+  const key = `${locale}:${name}`;
+  let f = cacheFmt.get(key);
+  if (!f) {
+    f = new Intl.DateTimeFormat(localeMeta[locale].intl, { timeZone: TIME_ZONE, ...opts });
+    cacheFmt.set(key, f);
+  }
+  return f;
+};
 
-const dayMonth = fmt({ day: "numeric", month: "long" });
-const fullDate = fmt({ day: "numeric", month: "long", year: "numeric" });
-const timeOnly = fmt({ hour: "2-digit", minute: "2-digit", hour12: false });
+const dayMonth = (l: Locale) => fmt(l, "dm", { day: "numeric", month: "long" });
+const fullDate = (l: Locale) => fmt(l, "full", { day: "numeric", month: "long", year: "numeric" });
+const timeOnly = (l: Locale) => fmt(l, "time", { hour: "2-digit", minute: "2-digit", hour12: false });
 const keyFmt = new Intl.DateTimeFormat("en-CA", {
   timeZone: TIME_ZONE,
   year: "numeric",
@@ -21,18 +30,18 @@ export function dayKey(d: Date | string) {
 }
 
 /** «3 жовтня 2026» */
-export function formatDate(iso: string) {
-  return fullDate.format(new Date(iso)).replace(/\s*р\.$/, "");
+export function formatDate(iso: string, locale: Locale) {
+  return fullDate(locale).format(new Date(iso)).replace(/\s*р\.$/, "");
 }
 
 /** «16:00» */
-export function formatTime(iso: string) {
-  return timeOnly.format(new Date(iso));
+export function formatTime(iso: string, locale: Locale = "uk") {
+  return timeOnly(locale).format(new Date(iso));
 }
 
 /** Розбивка для великої дати в списках: { day: "17", month: "травня", year: "2026" } */
-export function dateParts(iso: string) {
-  const parts = dayMonth.formatToParts(new Date(iso));
+export function dateParts(iso: string, locale: Locale) {
+  const parts = dayMonth(locale).formatToParts(new Date(iso));
   return {
     day: parts.find((p) => p.type === "day")?.value.padStart(2, "0") ?? "",
     month: parts.find((p) => p.type === "month")?.value ?? "",
@@ -50,24 +59,27 @@ export function yearOf(iso: string) {
  *  «8 — 10 березня 2026»
  *  «30 березня — 2 квітня 2026»
  */
-export function formatRange(start: string, finish: string | null) {
+export function formatRange(start: string, finish: string | null, locale: Locale) {
   if (!finish || dayKey(start) === dayKey(finish)) {
     const time = finish
-      ? `${formatTime(start)} — ${formatTime(finish)}`
-      : formatTime(start);
-    return `${formatDate(start)}, ${time}`;
+      ? `${formatTime(start, locale)} — ${formatTime(finish, locale)}`
+      : formatTime(start, locale);
+    return `${formatDate(start, locale)}, ${time}`;
   }
-  const a = dateParts(start);
-  const b = dateParts(finish);
-  const left = a.year === b.year ? `${Number(a.day)} ${a.month}` : formatDate(start);
-  return `${left} — ${formatDate(finish)}`;
+  const a = dateParts(start, locale);
+  const b = dateParts(finish, locale);
+  const dm = (p: typeof a) => `${Number(p.day)} ${p.month}`;
+  const left = a.year === b.year ? dm(a) : formatDate(start, locale);
+  return `${left} — ${formatDate(finish, locale)}`;
 }
 
 /** Час для рядка події: «16:00 — 19:00» або «до 10 березня». */
-export function formatTimeSpan(start: string, finish: string | null) {
-  if (!finish) return formatTime(start);
-  if (dayKey(start) === dayKey(finish)) return `${formatTime(start)} — ${formatTime(finish)}`;
-  const b = dateParts(finish);
+export function formatTimeSpan(start: string, finish: string | null, locale: Locale) {
+  if (!finish) return formatTime(start, locale);
+  if (dayKey(start) === dayKey(finish)) return `${formatTime(start, locale)} — ${formatTime(finish, locale)}`;
+  const b = dateParts(finish, locale);
+  if (locale === "en") return `until ${Number(b.day)} ${b.month}`;
+  if (locale === "el") return `έως ${Number(b.day)} ${b.month}`;
   return `до ${Number(b.day)} ${b.month}`;
 }
 
