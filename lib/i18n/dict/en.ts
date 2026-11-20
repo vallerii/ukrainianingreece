@@ -774,6 +774,13 @@ const data = {
     }
   ],
   "usefulPage": {
+    "downloads": {
+      "eyebrow": "Downloads",
+      "title": "Practical guides in Ukrainian, English and Greek",
+      "lead": "Free PDF guides for Ukrainians in Greece. Pick your language: every guide is available in three languages.",
+      "download": "Download",
+      "otherLangs": "Other languages:"
+    },
     "metaTitle": "Useful information",
     "metaDesc": "A guide for Ukrainians in Greece: documents, schools, healthcare, work, housing, banking, learning Greek and social support.",
     "h1A": "Useful ",
