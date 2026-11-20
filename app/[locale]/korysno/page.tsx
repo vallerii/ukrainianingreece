@@ -11,6 +11,8 @@ import ArticleRow from "@/components/cms/ArticleRow";
 import EmptyState from "@/components/cms/EmptyState";
 import SearchForm from "@/components/search/SearchForm";
 import Reveal from "@/components/ui/Reveal";
+import Downloads from "@/components/korysno/Downloads";
+import { getResourceGroups } from "@/lib/resources";
 
 export const revalidate = 60;
 
@@ -23,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ q?: string }> };
 
 export default async function Page({ params, searchParams }: Props) {
-  const { t: dict } = await initPage(params);
+  const { locale, t: dict } = await initPage(params);
   const u = dict.usefulPage;
   const topics = getTopics();
   const q = ((await searchParams).q ?? "").trim().slice(0, 100);
@@ -34,7 +36,12 @@ export default async function Page({ params, searchParams }: Props) {
     ? (await searchCms(terms)).articles.filter((a) => matchesAll(`${a.title} ${stripHtml(a.html)}`, terms))
     : null;
 
-  const counts = found ? [] : await Promise.all(topics.map((t) => getTopicArticles(t).then((a) => a.length)));
+  const [counts, resources] = found
+    ? [[], []]
+    : await Promise.all([
+        Promise.all(topics.map((t) => getTopicArticles(t).then((a) => a.length))),
+        getResourceGroups(),
+      ]);
 
   return (
     <>
@@ -103,8 +110,11 @@ export default async function Page({ params, searchParams }: Props) {
             </div>
           </section>
 
+          {/* Матеріали для завантаження (DatoCMS → Resource) */}
+          <Downloads groups={resources} locale={locale} t={u.downloads} />
+
           {/* Не знайшли відповідь */}
-          <section className="bg-paper-dim py-20">
+          <section className="bg-paper py-20">
             <div className="shell grid gap-10 md:grid-cols-[1fr_auto] md:items-end">
               <div>
                 <p className="eyebrow text-sky-700">{u.notFoundEyebrow}</p>
