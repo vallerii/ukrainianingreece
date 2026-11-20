@@ -1,10 +1,14 @@
 /** Поле пошуку. Звичайна GET-форма → /poshuk?q=… (працює і без JavaScript). */
+import { getT } from "@/lib/i18n/server";
+import { localizeHref } from "@/lib/i18n/config";
+import { getLocale } from "@/lib/i18n/server";
+
 export default function SearchForm({
   defaultValue = "",
   autoFocus = false,
   action = "/poshuk",
-  placeholder = "Школа, документи, Крит, волонтерство…",
-  label = "Пошук по сайту",
+  placeholder = getT().search.placeholder,
+  label = getT().search.label,
 }: {
   defaultValue?: string;
   autoFocus?: boolean;
@@ -13,7 +17,7 @@ export default function SearchForm({
   label?: string;
 }) {
   return (
-    <form action={action} method="get" role="search" className="group relative mt-10 max-w-3xl">
+    <form action={localizeHref(action, getLocale())} method="get" role="search" className="group relative mt-10 max-w-3xl">
       <label htmlFor="q" className="sr-only">
         {label}
       </label>
@@ -42,7 +46,7 @@ export default function SearchForm({
         type="submit"
         className="absolute right-0 top-1/2 -translate-y-1/2 rounded-full bg-ink px-5 py-2.5 text-[0.75rem] font-medium uppercase tracking-[0.14em] text-paper transition-colors hover:bg-sky-700"
       >
-        Шукати
+        {getT().search.submit}
       </button>
     </form>
   );

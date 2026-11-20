@@ -1,13 +1,15 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import DonateLink from "@/components/donate/DonateLink";
 import FormLink from "@/components/forms/FormLink";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import Reveal from "@/components/ui/Reveal";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export default function JoinCta() {
+  const t = useT();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
@@ -24,17 +26,16 @@ export default function JoinCta() {
         <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
           <div>
             <Reveal>
-              <p className="eyebrow text-wheat-700">Долучитися</p>
+              <p className="eyebrow text-wheat-700">{t.join.eyebrow}</p>
             </Reveal>
             <Reveal delay={0.06}>
               <h2 className="display mt-3 max-w-3xl text-[clamp(1.68rem,4.32vw,3.36rem)] text-ink">
-                Спільнота — це люди, які прийшли й залишились.
+                {t.join.title}
               </h2>
             </Reveal>
             <Reveal delay={0.12}>
               <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink/75">
-                Приєднуйтесь як волонтер, організація-партнер або донор. Або просто напишіть
-                нам — якщо потрібна допомога чи порада.
+                {t.join.lead}
               </p>
             </Reveal>
           </div>
@@ -42,9 +43,9 @@ export default function JoinCta() {
           <Reveal delay={0.16}>
             <div className="flex flex-col gap-4">
               {[
-                { label: "Підтримати донатом", href: "/pidtrymaty", primary: true },
-                { label: "Стати волонтером", href: "#volunteer" },
-                { label: "Долучити організацію", href: "#organization" },
+                { label: t.join.donate, href: "/pidtrymaty", primary: true },
+                { label: t.join.volunteer, href: "#volunteer" },
+                { label: t.join.org, href: "#organization" },
               ].map((b) => (
                 <ButtonOrDonate
                   key={b.label}

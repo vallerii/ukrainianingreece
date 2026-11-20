@@ -2,9 +2,9 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { motion, useScroll, useTransform, useReducedMotion } from "motion/react";
-import { site } from "@/lib/site";
+import { useT } from "@/components/i18n/I18nProvider";
 
 /**
  * Hero головної: фото акції на площі Синтагма + слоган.
@@ -12,6 +12,7 @@ import { site } from "@/lib/site";
  * щоб під ним одразу було видно початок наступної секції.
  */
 export default function Hero() {
+  const t = useT();
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -25,7 +26,7 @@ export default function Hero() {
       <motion.div style={{ y: photoY }} className="absolute inset-0 -bottom-[12%]">
         <Image
           src="/images/hero/syntagma.jpg"
-          alt="Українці з прапорами на площі Синтагма перед парламентом Греції"
+          alt={t.hero.alt}
           fill
           priority
           sizes="100vw"
@@ -42,7 +43,7 @@ export default function Hero() {
           {/* слова анімуються окремо, але між ними — справжні пробіли:
               інакше пошуковики, копіювання й читачі екрана бачать «Разомми—українськагромадаГреції» */}
           <h1 className="display text-white text-[clamp(2.2rem,5.2vw,4.4rem)] [text-shadow:0_2px_24px_rgba(0,10,30,0.6)]">
-            {site.slogan.split(" ").map((w, i, all) => (
+            {t.site.slogan.split(" ").map((w, i, all) => (
               <span key={i}>
               <span className="inline-block overflow-hidden align-bottom">
                 <motion.span
@@ -66,7 +67,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="mt-4 text-xl font-medium text-wheat-400 md:text-2xl [text-shadow:0_2px_16px_rgba(0,10,30,0.7)]"
           >
-            {site.tagline}
+            {t.site.tagline}
           </motion.p>
 
           <motion.div
@@ -79,14 +80,14 @@ export default function Hero() {
               href="/pro-nas"
               className="group inline-flex items-center gap-3 rounded-full bg-wheat-400 px-6 py-3 text-sm font-semibold tracking-wide text-ink transition-colors hover:bg-white"
             >
-              Дізнатися про нас
+              {t.hero.about}
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </Link>
             <Link
               href="/proyekty"
               className="link-underline text-sm font-semibold tracking-wide text-white [text-shadow:0_2px_14px_rgba(6,46,95,0.9)]"
             >
-              Наші проєкти
+              {t.hero.projects}
             </Link>
           </motion.div>
         </div>

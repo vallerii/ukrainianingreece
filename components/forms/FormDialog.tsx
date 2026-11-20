@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { FORM_TEXT, type FormKind } from "@/lib/forms";
+import { type FormKind } from "@/lib/forms";
+import { useT } from "@/components/i18n/I18nProvider";
 import ApplicationForm from "./ApplicationForm";
 
 export const OPEN_FORM = "udg:open-form";
@@ -35,7 +36,8 @@ export default function FormDialog() {
     };
   }, [kind]);
 
-  const t = kind ? FORM_TEXT[kind] : null;
+  const dict = useT();
+  const t = kind ? dict.forms.kinds[kind] : null;
 
   return (
     <AnimatePresence>
@@ -46,7 +48,7 @@ export default function FormDialog() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <button aria-label="Закрити" onClick={() => setKind(null)} className="absolute inset-0 bg-ink/55 backdrop-blur-[2px]" />
+          <button aria-label={dict.common.close} onClick={() => setKind(null)} className="absolute inset-0 bg-ink/55 backdrop-blur-[2px]" />
           <motion.div
             ref={box}
             role="dialog"
@@ -60,7 +62,7 @@ export default function FormDialog() {
           >
             <button
               onClick={() => setKind(null)}
-              aria-label="Закрити"
+              aria-label={dict.common.close}
               className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full text-mute transition-colors hover:bg-paper-dim hover:text-ink"
             >
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">

@@ -1,28 +1,19 @@
-import { plural } from "./projects";
+import type { Dict } from "./i18n/dictionaries";
 
+/** Незмінні дані. Тексти, що залежать від мови (назва, гасло, адреса), — у словниках t.site. */
 export const site = {
-  name: "Об'єднана українська діаспора в Греції",
   shortName: "УДГ",
-  slogan: "Разом ми — українська громада Греції",
-  tagline: "Підтримка, єдність і спільна дія!",
   // контакти — з довідки організації (документ «UA Diaspora in Greece», жовтень 2026)
   email: "ukrdiasporagr@gmail.com",
   // основний телефон — за правкою клієнта 22.10.2026
   phone: "+30 697 653 3390",
-  address: "Feron 4, Athens 104 34",
   /** Офіс / Інформаційний центр, вул. Ферон 4 */
   office: { hours: "10:00–17:00" },
   founded: 2023,
-  cities: ["Афіни", "Крит"],
   socials: [
     { label: "Facebook", short: "FB", icon: "facebook", href: "https://www.facebook.com/uadiasporaingreece/" },
     { label: "Instagram", short: "IG", icon: "instagram", href: "https://www.instagram.com/ukrdiasporagr/" },
     // YouTube — додати, коли буде відомо посилання на канал
-  ] as const,
-  languages: [
-    { code: "uk", short: "UA", label: "Українська" },
-    { code: "en", short: "EN", label: "English" },
-    { code: "el", short: "GR", label: "Ελληνικά" },
   ] as const,
 };
 
@@ -32,55 +23,41 @@ export type NavItem = {
   children?: { label: string; href: string; note?: string }[];
 };
 
-export const nav: NavItem[] = [
-  {
-    label: "Про нас",
-    href: "/pro-nas",
-    children: [
-      { label: "Хто ми є", href: "/pro-nas#opys", note: "Місія, візія, цінності" },
-      { label: "Цілі", href: "/pro-nas#tsili", note: "Що ми робимо щодня" },
-      { label: "Історія", href: "/pro-nas#istoriya", note: "Як усе почалося" },
-      { label: "Географія", href: "/pro-nas#geografiya", note: "Де ми присутні" },
-      { label: "Команда", href: "/pro-nas#komanda", note: "Люди спільноти" },
-      { label: "Засновники та партнери", href: "/pro-nas#zasnovnyky", note: "Організації мережі" },
-    ],
-  },
-  { label: "Новини", href: "/novyny" },
-  { label: "Блог", href: "/blog" },
-  {
-    label: "Події та звіти",
-    href: "/podiyi",
-    children: [
-      { label: "Прийдешні події", href: "/podiyi", note: "Календар спільноти" },
-      { label: "Звіти", href: "/podiyi/zvity", note: "Прозорість і результати" },
-    ],
-  },
-  {
-    label: "Проєкти",
-    href: "/proyekty",
-    // пункти меню підставляються з DatoCMS у buildNav()
-    children: [],
-  },
-  { label: "Корисна інформація", href: "/korysno" },
-  { label: "Контакти", href: "/kontakty" },
-];
-
-
-
-
-
-export const partners = [
-  "Посольство України",
-  "Δήμος Αθηναίων",
-  "Greek Council for Refugees",
-  "UNHCR Greece",
-  "Каритас Еллас",
-  "Українська Всесвітня Координаційна Рада",
-];
+export function getNav(t: Dict): NavItem[] {
+  const n = t.nav;
+  return [
+    {
+      label: n.about,
+      href: "/pro-nas",
+      children: [
+        { label: n.who, href: "/pro-nas#opys", note: n.whoNote },
+        { label: n.goals, href: "/pro-nas#tsili", note: n.goalsNote },
+        { label: n.history, href: "/pro-nas#istoriya", note: n.historyNote },
+        { label: n.geo, href: "/pro-nas#geografiya", note: n.geoNote },
+        { label: n.team, href: "/pro-nas#komanda", note: n.teamNote },
+        { label: n.founders, href: "/pro-nas#zasnovnyky", note: n.foundersNote },
+      ],
+    },
+    { label: n.news, href: "/novyny" },
+    { label: n.blog, href: "/blog" },
+    {
+      label: n.events,
+      href: "/podiyi",
+      children: [
+        { label: n.upcoming, href: "/podiyi", note: n.upcomingNote },
+        { label: n.reports, href: "/podiyi/zvity", note: n.reportsNote },
+      ],
+    },
+    // пункти «Проєкти» підставляються з DatoCMS у buildNav()
+    { label: n.projects, href: "/proyekty", children: [] },
+    { label: n.useful, href: "/korysno" },
+    { label: n.contacts, href: "/kontakty" },
+  ];
+}
 
 /** Меню з пунктами «Проєкти» з DatoCMS. */
-export function buildNav(projects: { navLabel: string; note: string; slug: string }[]): NavItem[] {
-  return nav.map((item) =>
+export function buildNav(t: Dict, projects: { navLabel: string; note: string; slug: string }[]): NavItem[] {
+  return getNav(t).map((item) =>
     item.href === "/proyekty"
       ? { ...item, children: projects.map((p) => ({ label: p.navLabel, href: `/proyekty/${p.slug}`, note: p.note })) }
       : item,
@@ -91,10 +68,7 @@ export function buildNav(projects: { navLabel: string; note: string; slug: strin
  * Цифри для «Про нас» (правка клієнта 18.10.2026 — лише дві).
  * Кількість засновників — з DatoCMS (Founder of the union).
  */
-export const buildStats = (foundersCount: number) => [
-  {
-    value: String(foundersCount),
-    label: plural(foundersCount, ["організація-засновник", "організації-засновники", "організацій-засновників"]),
-  },
-  { value: "3", label: "міста присутності" },
+export const buildStats = (t: Dict, foundersCount: number) => [
+  { value: String(foundersCount), label: t.stats.founders(foundersCount) },
+  { value: "3", label: t.stats.cities },
 ];

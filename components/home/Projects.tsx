@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import type { ProjectCard } from "@/lib/organizations";
 import SectionHead from "@/components/ui/SectionHead";
 import Reveal from "@/components/ui/Reveal";
@@ -8,11 +8,14 @@ import Reveal from "@/components/ui/Reveal";
  * Постійні проєкти на головній: нумерований список, у кожному рядку видно фото або логотип
  * (раніше картинка з’являлася лише при наведенні — на телефоні її не було видно взагалі).
  */
+import { getT } from "@/lib/i18n/server";
+
 export default function Projects({ projects }: { projects: ProjectCard[] }) {
+  const t = getT();
   return (
     <section id="proyekty" className="relative bg-paper py-12 md:py-16">
       <div className="shell">
-        <SectionHead eyebrow="Постійні проєкти" title="Що працює щотижня" link="/proyekty" />
+        <SectionHead eyebrow={t.home.projectsEyebrow} title={t.home.projectsTitle} link="/proyekty" />
 
         <div>
           {projects.map((p, idx) => (

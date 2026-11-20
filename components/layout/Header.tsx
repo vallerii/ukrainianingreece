@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import DonateLink from "@/components/donate/DonateLink";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { usePathname } from "next/navigation";
 import { site, type NavItem } from "@/lib/site";
 import Image from "next/image";
 import SocialIcon from "@/components/ui/SocialIcon";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import { useT } from "@/components/i18n/I18nProvider";
+import { stripLocale } from "@/lib/i18n/config";
 
 function Logo({ solid }: { solid: boolean }) {
+  const t = useT();
   return (
-    <Link href="/" className="group flex items-center gap-3.5" aria-label={site.name}>
+    <Link href="/" className="group flex items-center gap-3.5" aria-label={t.site.name}>
       <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-black/10">
         <Image
           src="/logo-mark.png"
@@ -23,18 +27,18 @@ function Logo({ solid }: { solid: boolean }) {
       </span>
       <span className="hidden sm:block">
         <span
-          className={`wordmark block text-[0.82rem] transition-colors lg:text-[0.86rem] xl:text-[0.95rem] ${
+          className={`wordmark block whitespace-nowrap text-[0.82rem] transition-colors lg:text-[0.86rem] xl:text-[0.95rem] ${
             solid ? "text-ink" : "text-white"
           }`}
         >
-          Об&apos;єднана українська
+          {t.site.nameLine1}
         </span>
         <span
-          className={`wordmark block text-[0.82rem] transition-colors lg:text-[0.86rem] xl:text-[0.95rem] ${
+          className={`wordmark block whitespace-nowrap text-[0.82rem] transition-colors lg:text-[0.86rem] xl:text-[0.95rem] ${
             solid ? "text-mute" : "text-white"
           }`}
         >
-          діаспора в Греції
+          {t.site.nameLine2}
         </span>
       </span>
     </Link>
@@ -47,7 +51,8 @@ export default function Header({ nav }: { nav: NavItem[] }) {
   const [open, setOpen] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const { scrollY } = useScroll();
-  const pathname = usePathname();
+  const pathname = stripLocale(usePathname() || "/");
+  const t = useT();
 
   useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 80));
 
@@ -100,21 +105,14 @@ export default function Header({ nav }: { nav: NavItem[] }) {
               ))}
             </div>
             <span className={`h-3.5 w-px ${overHero ? "bg-white/25" : "bg-line"}`} />
-            <div className="flex items-center gap-2.5">
-              {site.languages.map((l, i) => (
-                <button
-                  key={l.code}
-                  lang={l.code}
-                  aria-label={l.label}
-                  title={l.label}
-                  className={`px-0.5 font-medium uppercase tracking-[0.12em] transition-opacity ${
-                    i === 0 ? "opacity-100" : "opacity-55 hover:opacity-100"
-                  }`}
-                >
-                  {l.short}
-                </button>
-              ))}
-            </div>
+            <LanguageSwitcher
+              className="flex items-center gap-2.5"
+              itemClass={(active) =>
+                `px-0.5 font-medium uppercase tracking-[0.12em] transition-opacity ${
+                  active ? "opacity-100" : "opacity-55 hover:opacity-100"
+                }`
+              }
+            />
             <span className={`h-3.5 w-px ${overHero ? "bg-white/25" : "bg-line"}`} />
             <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="transition-opacity hover:opacity-75">
               {site.phone}
@@ -129,7 +127,7 @@ export default function Header({ nav }: { nav: NavItem[] }) {
         </div>
 
         {/* main bar */}
-        <div className="shell flex h-[4.6rem] items-center justify-between gap-6">
+        <div className="shell flex h-[4.6rem] items-center justify-between gap-4 xl:gap-6">
           <Logo solid={tone} />
 
           <nav className="hidden items-center gap-1 lg:flex">
@@ -137,7 +135,7 @@ export default function Header({ nav }: { nav: NavItem[] }) {
               <div key={item.href} onMouseEnter={() => setOpen(item.label)}>
                 <Link
                   href={item.href}
-                  className={`relative block whitespace-nowrap px-2 py-2 text-[14px] font-medium transition-colors xl:px-3 xl:text-[15.5px] ${
+                  className={`relative block whitespace-nowrap px-1.5 py-2 text-[13.5px] font-medium transition-colors xl:px-3 xl:text-[15.5px] ${
                     tone ? "text-ink hover:text-sky-700" : "text-white hover:text-wheat-200"
                   }`}
                 >
@@ -155,11 +153,11 @@ export default function Header({ nav }: { nav: NavItem[] }) {
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 xl:gap-4">
             {/* Пошук по сайту */}
             <Link
               href="/poshuk"
-              aria-label="Пошук по сайту"
+              aria-label={t.header.search}
               className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
                 tone ? "text-ink hover:bg-paper-dim hover:text-sky-700" : "text-white hover:text-wheat-400"
               }`}
@@ -170,18 +168,18 @@ export default function Header({ nav }: { nav: NavItem[] }) {
               </svg>
             </Link>
             <DonateLink
-              className={`hidden rounded-full px-5 py-2.5 text-[0.75rem] font-medium uppercase tracking-[0.14em] transition-all lg:inline-block ${
+              className={`hidden rounded-full px-4 py-2.5 text-[0.75rem] xl:px-5 font-medium uppercase tracking-[0.14em] transition-all lg:inline-block ${
                 solid
                   ? "bg-ink text-paper hover:bg-sky-700"
                   : "border border-white/35 text-white hover:border-wheat-400 hover:text-wheat-400"
               }`}
             >
-              Донат
+              {t.header.donate}
             </DonateLink>
 
             <button
               onClick={() => setMobile((v) => !v)}
-              aria-label="Меню"
+              aria-label={t.header.menu}
               className={`flex h-10 w-10 flex-col items-center justify-center gap-[5px] lg:hidden ${
                 tone ? "text-ink" : "text-white"
               }`}
@@ -306,20 +304,10 @@ export default function Header({ nav }: { nav: NavItem[] }) {
                     </a>
                   ))}
                 </div>
-                <div className="flex gap-3 text-sm">
-                  {site.languages.map((l, i) => (
-                    <button
-                      key={l.code}
-                      lang={l.code}
-                      aria-label={l.label}
-                      className={`font-medium uppercase tracking-[0.12em] ${
-                        i === 0 ? "text-ink" : "text-mute"
-                      }`}
-                    >
-                      {l.short}
-                    </button>
-                  ))}
-                </div>
+                <LanguageSwitcher
+                  className="flex gap-3 text-sm"
+                  itemClass={(active) => `font-medium uppercase tracking-[0.12em] ${active ? "text-ink" : "text-mute"}`}
+                />
               </div>
 
               {/* <Link
@@ -334,7 +322,7 @@ export default function Header({ nav }: { nav: NavItem[] }) {
                 onClick={() => setMobile(false)}
                 className="mt-3 block rounded-full bg-wheat-400 py-4 text-center text-sm font-medium uppercase tracking-[0.14em] text-ink"
               >
-                Донат
+                {t.header.donate}
               </DonateLink>
             </div>
           </motion.div>

@@ -10,7 +10,10 @@ const SLOTS = 8;
  * Календар подій (з DatoCMS). Спершу прийдешні; якщо їх менше восьми —
  * добираємо нещодавні минулі (позначені «Відбулося»), щоб сітка не зяяла.
  */
+import { getT } from "@/lib/i18n/server";
+
 export default function Events({ upcoming, recent }: { upcoming: CmsEvent[]; recent: CmsEvent[] }) {
+  const t = getT();
   // подія, що триває кілька днів (напр. школа іконопису), є і серед прийдешніх, і серед «минулих
   // за датою початку» — показуємо її один раз; з минулих беремо лише ті, що справді завершилися
   const seen = new Set(upcoming.map((e) => e.id));
@@ -21,10 +24,10 @@ export default function Events({ upcoming, recent }: { upcoming: CmsEvent[]; rec
     <section id="podiyi" className="bg-paper py-12 md:py-16">
       <div className="shell">
         <SectionHead
-          eyebrow={upcoming.length > 0 ? "Прийдешні події" : "Події"}
-          title="Календар подій"
+          eyebrow={upcoming.length > 0 ? t.home.eventsEyebrow : t.home.eventsEyebrowNone}
+          title={t.home.eventsTitle}
           link="/podiyi"
-          linkLabel="Усі події та звіти"
+          linkLabel={t.home.eventsLink}
         />
 
         {cards.length > 0 ? (
@@ -32,9 +35,9 @@ export default function Events({ upcoming, recent }: { upcoming: CmsEvent[]; rec
         ) : (
           <Reveal>
             <div className="py-10">
-              <p className="display text-[clamp(1.2rem,2vw,1.5rem)] text-ink">Нові події зараз плануються.</p>
+              <p className="display text-[clamp(1.2rem,2vw,1.5rem)] text-ink">{t.home.eventsEmpty}</p>
               <p className="mt-2 max-w-xl leading-relaxed text-mute">
-                Стежте за анонсами в соцмережах або загляньте сюди трохи згодом.
+                {t.home.eventsEmptyLead}
               </p>
             </div>
           </Reveal>

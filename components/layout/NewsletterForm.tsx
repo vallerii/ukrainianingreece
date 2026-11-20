@@ -1,20 +1,23 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useId, useState } from "react";
 import { site } from "@/lib/site";
+import { useT } from "@/components/i18n/I18nProvider";
 
 type State = "idle" | "sending" | "done" | "error";
 
-const ERRORS: Record<string, string> = {
-  email: "Перевірте адресу e-mail.",
-  consent: "Потрібна ваша згода на отримання листів.",
-  rate_limited: "Забагато спроб. Спробуйте за кілька хвилин.",
-  not_configured: `Підписка тимчасово недоступна. Напишіть нам: ${site.email}`,
-};
 
 /** Підписка на розсилку в підвалі сайту → /api/subscribe → Brevo (double opt-in). */
 export default function NewsletterForm() {
+  const t = useT();
+  const n = t.newsletter;
+  const ERRORS: Record<string, string> = {
+    email: n.errEmail,
+    consent: n.errConsent,
+    rate_limited: n.errRate,
+    not_configured: `${n.errConfig} ${site.email}`,
+  };
   const id = useId();
   const [state, setState] = useState<State>("idle");
   const [error, setError] = useState("");
@@ -41,18 +44,18 @@ export default function NewsletterForm() {
         form.reset();
       } else {
         setState("error");
-        setError(ERRORS[json.error ?? ""] ?? "Не вдалося підписатися. Спробуйте пізніше.");
+        setError(ERRORS[json.error ?? ""] ?? n.errGeneric);
       }
     } catch {
       setState("error");
-      setError("Немає звʼязку. Спробуйте пізніше.");
+      setError(n.errNetwork);
     }
   }
 
   if (state === "done") {
     return (
       <p role="status" className="mt-5 text-[0.92rem] leading-relaxed text-paper">
-        Майже готово! Ми надіслали вам листа — підтвердьте підписку за посиланням у ньому.
+        {n.done}
       </p>
     );
   }
@@ -61,7 +64,7 @@ export default function NewsletterForm() {
     <form className="mt-5" onSubmit={onSubmit}>
       <div className="flex items-center gap-3 border-b border-white/25 pb-2 focus-within:border-wheat-400">
         <label htmlFor={`${id}-email`} className="sr-only">
-          Ваш e-mail
+          {n.email}
         </label>
         <input
           id={`${id}-email`}
@@ -75,7 +78,7 @@ export default function NewsletterForm() {
         <button
           type="submit"
           disabled={state === "sending"}
-          aria-label="Підписатися на розсилку"
+          aria-label={n.submit}
           className="flex h-9 w-9 shrink-0 items-center justify-center text-lg text-wheat-400 transition-transform hover:translate-x-1 disabled:opacity-50"
         >
           {state === "sending" ? "…" : "→"}
@@ -85,7 +88,7 @@ export default function NewsletterForm() {
       {/* пастка для ботів: людина цього поля не бачить */}
       <div aria-hidden="true" className="absolute left-[-9999px] h-px w-px overflow-hidden">
         <label>
-          Не заповнюйте
+          {n.honeypot}
           <input name="website_hp" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
@@ -93,11 +96,11 @@ export default function NewsletterForm() {
       <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-[0.8rem] leading-snug text-sky-100/70">
         <input name="consent" type="checkbox" required className="mt-0.5 h-4 w-4 shrink-0 accent-wheat-400" />
         <span>
-          Погоджуюсь отримувати листи й приймаю{" "}
+          {n.consent1}{" "}
           <Link href="/polityka" className="underline underline-offset-2 hover:text-paper">
-            політику конфіденційності
+            {n.consentLink}
           </Link>
-          . Відписатися можна будь-коли.
+          {n.consent2}
         </span>
       </label>
 

@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { AnimatePresence, motion } from "motion/react";
-import { mission, values, vision } from "@/lib/about";
+import { useT } from "@/components/i18n/I18nProvider";
 import type { Founder } from "@/lib/organizations";
 import Reveal from "@/components/ui/Reveal";
 
@@ -15,6 +15,8 @@ export default function About({
   founders: Founder[];
   stats: { value: string; label: string }[];
 }) {
+  const t = useT();
+  const { mission, values, vision } = t.about;
   const [i, setI] = useState(0);
 
   useEffect(() => {
@@ -31,27 +33,25 @@ export default function About({
           {/* text */}
           <div>
             <Reveal>
-              <p className="eyebrow text-sky-700">Про нас</p>
+              <p className="eyebrow text-sky-700">{t.home.aboutEyebrow}</p>
             </Reveal>
             <Reveal delay={0.05}>
               <h2 className="display mt-3 max-w-2xl text-[clamp(1.6rem,3.3vw,2.6rem)] text-ink">
-                <span className="text-sky-700">Мережа українських організацій та спільнот</span> в Греції,
-                об’єднаних спільними цінностями та прагненнями.
+                <span className="text-sky-700">{t.home.aboutTitleA}</span>
+                {t.home.aboutTitleB}
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
-                Ми сприяємо співпраці й взаємопідтримці, допомагаємо українцям знаходити необхідні
-                ресурси та представляємо інтереси громади у діалозі з грецькою владою, медіа й
-                партнерами.
+                {t.home.aboutLead}
               </p>
             </Reveal>
 
             <div className="mt-8 space-y-5">
               {[
-                { k: "Місія", v: mission },
-                { k: "Візія", v: vision },
-                { k: "Цінності", v: values.map((x) => x.k).join(" · ") },
+                { k: t.home.mission, v: mission },
+                { k: t.home.vision, v: vision },
+                { k: t.home.values, v: values.map((x) => x.k).join(" · ") },
               ].map((row, idx) => (
                 <Reveal key={row.k} delay={0.06 * idx}>
                   <div className="grid gap-1.5 border-t border-line pt-4 sm:grid-cols-[7rem_1fr] sm:gap-6">
@@ -67,7 +67,7 @@ export default function About({
                 href="/pro-nas"
                 className="link-underline mt-8 inline-flex items-center gap-2 text-sm font-bold text-ink"
               >
-                Повна історія та команда <span>→</span>
+                {t.home.aboutMore} <span>→</span>
               </Link>
             </Reveal>
             {/* цифри — під текстом, щоб не висіли окремим рядком */}
@@ -122,7 +122,7 @@ export default function About({
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <p className="eyebrow text-white/70">{active.role}</p>
+                    <p className="eyebrow text-white/70">{t.role[active.role]}</p>
                     <Link
                       href={active.href}
                       className="link-underline mt-2 block font-display text-2xl font-semibold text-white"

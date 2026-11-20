@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useT } from "@/components/i18n/I18nProvider";
+
+import Link from "@/components/i18n/Link";
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 
 const base =
@@ -51,7 +53,7 @@ export function Select({
       </Label>
       <select id={name} name={name} required={required} defaultValue="" className={`${base} cursor-pointer`} {...rest}>
         <option value="" disabled>
-          Оберіть…
+          {useT().forms.choose}
         </option>
         {options.map((o) => (
           <option key={o} value={o}>
@@ -83,20 +85,21 @@ export function Chips({ label, name, options }: { label: string; name: string; o
 
 /** Згода з посиланням на політику + приховане поле-пастка для ботів. */
 export function ConsentAndHoneypot() {
+  const t = useT();
   return (
     <>
       <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label>
-          Не заповнюйте це поле
+          {t.forms.honeypot}
           <input type="text" name="website_hp" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
       <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-soft">
         <input type="checkbox" name="consent" required className="mt-1 h-4 w-4 accent-[#062E5F]" />
         <span>
-          Погоджуюсь на обробку моїх даних для розгляду заявки згідно з{" "}
+          {t.forms.consent1}{" "}
           <Link href="/polityka" target="_blank" className="text-sky-700 underline underline-offset-2">
-            політикою конфіденційності
+            {t.forms.consentLink}
           </Link>
           .
         </span>

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { aboutNav } from "@/lib/about";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export default function AboutNav() {
+  const t = useT();
+  const aboutNav = t.about.aboutNav;
   const [active, setActive] = useState(aboutNav[0].id);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export default function AboutNav() {
 
   return (
     <nav
-      aria-label="Розділи сторінки"
+      aria-label={t.aboutUi.navLabel}
       className="sticky top-[4.6rem] z-30 border-y border-line bg-paper/92 backdrop-blur-md"
     >
       <div className="shell">

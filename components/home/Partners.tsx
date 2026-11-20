@@ -1,14 +1,16 @@
-import { partners } from "@/lib/site";
+import { getT } from "@/lib/i18n/server";
 import Reveal from "@/components/ui/Reveal";
 
 export default function Partners() {
+  const t = getT();
+  const partners = t.partners;
   const row = [...partners, ...partners];
 
   return (
     <section className="relative overflow-hidden border-t border-line bg-paper py-10">
       <div className="shell">
         <Reveal>
-          <p className="eyebrow text-sky-700">Партнери та підтримка</p>
+          <p className="eyebrow text-sky-700">{t.partnersBlock.eyebrow}</p>
         </Reveal>
       </div>
 

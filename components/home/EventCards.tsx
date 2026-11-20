@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { CmsEvent } from "@/lib/cms";
 import { dateParts, formatRange, formatTimeSpan } from "@/lib/format";
 import Reveal from "@/components/ui/Reveal";
+import { useLocale, useT } from "@/components/i18n/I18nProvider";
 
 /**
  * Календар подій на головній — вертикальні картки з афішею (4 в ряд, до 8 штук).
@@ -30,7 +31,9 @@ export default function EventCards({ events }: { events: CmsEvent[] }) {
 }
 
 function EventCard({ event, onOpen }: { event: CmsEvent; onOpen: () => void }) {
-  const d = dateParts(event.start);
+  const t = useT();
+  const locale = useLocale();
+  const d = dateParts(event.start, locale);
   const past = event.status === "past";
   return (
     <button
@@ -60,12 +63,12 @@ function EventCard({ event, onOpen }: { event: CmsEvent; onOpen: () => void }) {
         {event.status === "ongoing" && (
           <span className="absolute right-2 top-2 inline-flex items-center gap-1.5 bg-wheat-400 px-2 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ink">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
-            Триває
+            {t.event.ongoingShort}
           </span>
         )}
         {past && (
           <span className="absolute right-2 top-2 bg-ink/75 px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] text-paper">
-            Відбулося
+            {t.event.past}
           </span>
         )}
       </div>
@@ -75,13 +78,13 @@ function EventCard({ event, onOpen }: { event: CmsEvent; onOpen: () => void }) {
           {Number(d.day)} {d.month}
         </span>
         <span>·</span>
-        <span>{formatTimeSpan(event.start, event.finish)}</span>
+        <span>{formatTimeSpan(event.start, event.finish, locale)}</span>
       </p>
       <h3 className="mt-1 font-display text-[1.08rem] font-medium leading-snug text-ink transition-colors group-hover:text-sky-700 md:text-[1.15rem]">
         {event.title}
       </h3>
       <span className="mt-2 inline-flex items-center gap-1.5 text-sm text-mute transition-colors group-hover:text-ink">
-        Повний анонс
+        {t.event.fullAnnouncement}
         <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
       </span>
     </button>
@@ -89,6 +92,8 @@ function EventCard({ event, onOpen }: { event: CmsEvent; onOpen: () => void }) {
 }
 
 function EventDialog({ event, onClose }: { event: CmsEvent | null; onClose: () => void }) {
+  const t = useT();
+  const locale = useLocale();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -131,7 +136,7 @@ function EventDialog({ event, onClose }: { event: CmsEvent | null; onClose: () =
               ref={closeRef}
               type="button"
               onClick={onClose}
-              aria-label="Закрити"
+              aria-label={t.common.close}
               className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-paper/90 text-xl text-ink ring-1 ring-line transition-colors hover:bg-ink hover:text-paper"
             >
               ×
@@ -156,11 +161,11 @@ function EventDialog({ event, onClose }: { event: CmsEvent | null; onClose: () =
             )}
 
             <div className="p-6 md:p-8">
-              <p className="eyebrow text-sky-700">{event.tags.map((t) => t.title).join(" · ") || "Подія"}</p>
+              <p className="eyebrow text-sky-700">{event.tags.map((t) => t.title).join(" · ") || t.event.fallbackTag}</p>
               <h2 id="event-dialog-title" className="display mt-3 pr-10 text-[clamp(1.5rem,2.6vw,2rem)] text-ink">
                 {event.title}
               </h2>
-              <p className="mt-3 text-[1.05rem] font-medium text-ink">{formatRange(event.start, event.finish)}</p>
+              <p className="mt-3 text-[1.05rem] font-medium text-ink">{formatRange(event.start, event.finish, locale)}</p>
               {event.description && (
                 <p className="mt-4 leading-relaxed text-ink-soft">{event.description}</p>
               )}
@@ -174,7 +179,7 @@ function EventDialog({ event, onClose }: { event: CmsEvent | null; onClose: () =
                 href={`/podiyi/${event.slug}`}
                 className="link-underline mt-6 inline-block text-sm font-semibold text-ink"
               >
-                Сторінка події та додавання в календар →
+                {t.event.pageLink}
               </Link>
             </div>
           </motion.div>

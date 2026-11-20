@@ -1,7 +1,9 @@
 "use client";
 
+import { useT } from "@/components/i18n/I18nProvider";
+
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { motion } from "motion/react";
 import type { Founder } from "@/lib/organizations";
 import Reveal from "@/components/ui/Reveal";
@@ -17,6 +19,7 @@ const COLS: Record<number, string> = {
 };
 
 export default function Founders({ founders }: { founders: Founder[] }) {
+  const t = useT();
   return (
     <div className={`mt-8 grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-3 ${COLS[founders.length] ?? "lg:grid-cols-4"}`}>
       {founders.map((f, idx) => (
@@ -38,7 +41,7 @@ export default function Founders({ founders }: { founders: Founder[] }) {
                   <div className="relative h-full w-full">
                     <Image
                       src={f.logo.src}
-                      alt={`Логотип: ${f.name}`}
+                      alt={`${t.founders.logo} ${f.name}`}
                       fill
                       sizes="(min-width: 1024px) 22vw, 45vw"
                       className="object-contain"
@@ -72,7 +75,7 @@ export default function Founders({ founders }: { founders: Founder[] }) {
                 {String(idx + 1).padStart(2, "0")}
               </span>
             </div>
-            <p className={`eyebrow mt-3 ${f.role === "Засновник" ? "text-sky-700" : "text-wheat-700"}`}>{f.role}</p>
+            <p className={`eyebrow mt-3 ${f.role === "founder" ? "text-sky-700" : "text-wheat-700"}`}>{t.role[f.role]}</p>
             <p className="mt-1 font-display text-[1.02rem] leading-snug text-ink transition-colors group-hover:text-sky-700">
               {f.name}
             </p>

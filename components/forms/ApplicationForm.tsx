@@ -2,19 +2,23 @@
 
 import { useState, type FormEvent } from "react";
 import { site } from "@/lib/site";
-import { FORM_TEXT, VOLUNTEER_SKILLS, VOLUNTEER_TIME, type FormKind } from "@/lib/forms";
+import { type FormKind } from "@/lib/forms";
+import { useT } from "@/components/i18n/I18nProvider";
+import { fill } from "@/lib/i18n/fill";
 import { Area, Chips, ConsentAndHoneypot, Field, Select } from "./fields";
 
 type State = "idle" | "sending" | "done" | "error";
 
-const ERRORS: Record<string, string> = {
-  validation: "Перевірте, будь ласка, обов’язкові поля та e-mail.",
-  consent: "Потрібна згода на обробку даних.",
-  rate_limited: "Забагато спроб. Спробуйте за кілька хвилин.",
-  not_configured: "Форма ще не підключена до бази. Напишіть нам на пошту — відповімо.",
-};
 
 export default function ApplicationForm({ kind }: { kind: FormKind }) {
+  const t = useT();
+  const f = t.forms;
+  const ERRORS: Record<string, string> = {
+    validation: f.errValidation,
+    consent: f.errConsent,
+    rate_limited: f.errRate,
+    not_configured: f.errConfig,
+  };
   const [state, setState] = useState<State>("idle");
   const [error, setError] = useState("");
 
@@ -35,10 +39,10 @@ export default function ApplicationForm({ kind }: { kind: FormKind }) {
       });
       const json = await res.json().catch(() => ({}));
       if (res.ok && json.ok) return setState("done");
-      setError(ERRORS[json.error] ?? `Не вдалося надіслати. Спробуйте ще раз або напишіть на ${site.email}.`);
+      setError(ERRORS[json.error] ?? fill(f.errGeneric, { email: site.email }));
       setState("error");
     } catch {
-      setError(`Немає з’єднання. Спробуйте ще раз або напишіть на ${site.email}.`);
+      setError(fill(f.errNetwork, { email: site.email }));
       setState("error");
     }
   }
@@ -46,8 +50,8 @@ export default function ApplicationForm({ kind }: { kind: FormKind }) {
   if (state === "done")
     return (
       <div role="status" className="border-l-2 border-wheat-400 bg-wheat-50 px-6 py-6">
-        <p className="font-display text-lg text-ink">Заявку надіслано</p>
-        <p className="mt-2 leading-relaxed text-ink-soft">{FORM_TEXT[kind].done}</p>
+        <p className="font-display text-lg text-ink">{f.sent}</p>
+        <p className="mt-2 leading-relaxed text-ink-soft">{f.kinds[kind].done}</p>
       </div>
     );
 
@@ -56,36 +60,36 @@ export default function ApplicationForm({ kind }: { kind: FormKind }) {
       {kind === "volunteer" ? (
         <>
           <div className="grid gap-6 sm:grid-cols-2">
-            <Field label="Ім’я" name="name" required autoComplete="name" />
-            <Field label="Місто" name="city" required list="udg-cities" />
+            <Field label={f.name} name="name" required autoComplete="name" />
+            <Field label={f.city} name="city" required list="udg-cities" />
             <Field label="E-mail" name="email" type="email" required autoComplete="email" />
-            <Field label="Телефон / Viber / Telegram" name="phone" type="tel" autoComplete="tel" />
+            <Field label={f.phoneMessengers} name="phone" type="tel" autoComplete="tel" />
           </div>
           <datalist id="udg-cities">
-            {site.cities.map((c) => (
+            {t.site.cities.map((c) => (
               <option key={c} value={c} />
             ))}
           </datalist>
-          <Chips label="Чим можете допомогти" name="skills" options={VOLUNTEER_SKILLS} />
-          <Select label="Скільки часу готові приділяти" name="availability" options={VOLUNTEER_TIME} />
-          <Area label="Кілька слів про себе (необов’язково)" name="message" />
+          <Chips label={f.skills} name="skills" options={f.skillOptions} />
+          <Select label={f.time} name="availability" options={f.timeOptions} />
+          <Area label={f.aboutYou} name="message" />
         </>
       ) : (
         <>
           <div className="grid gap-6 sm:grid-cols-2">
-            <Field label="Назва організації" name="name" required />
-            <Field label="Місто" name="city" required />
-            <Field label="Рік заснування" name="founded_year" inputMode="numeric" maxLength={4} />
-            <Field label="Сайт або сторінка в соцмережах" name="website" type="url" placeholder="https://" />
+            <Field label={f.orgName} name="name" required />
+            <Field label={f.city} name="city" required />
+            <Field label={f.founded} name="founded_year" inputMode="numeric" maxLength={4} />
+            <Field label={f.website} name="website" type="url" placeholder="https://" />
           </div>
-          <Area label="Коротко про організацію: чим займаєтесь, для кого" name="summary" required rows={4} />
-          <p className="pt-2 text-sm font-medium text-ink">Контактна особа</p>
+          <Area label={f.orgSummary} name="summary" required rows={4} />
+          <p className="pt-2 text-sm font-medium text-ink">{f.contact}</p>
           <div className="grid gap-6 sm:grid-cols-2">
-            <Field label="Ім’я та прізвище" name="contact_name" required autoComplete="name" />
+            <Field label={f.fullName} name="contact_name" required autoComplete="name" />
             <Field label="E-mail" name="contact_email" type="email" required autoComplete="email" />
-            <Field label="Телефон" name="contact_phone" type="tel" autoComplete="tel" />
+            <Field label={f.phone} name="contact_phone" type="tel" autoComplete="tel" />
           </div>
-          <Area label="Чому хочете долучитися? (необов’язково)" name="message" />
+          <Area label={f.why} name="message" />
         </>
       )}
 
@@ -102,7 +106,7 @@ export default function ApplicationForm({ kind }: { kind: FormKind }) {
         disabled={state === "sending"}
         className="group inline-flex items-center gap-3 rounded-full bg-ink px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:bg-sky-700 disabled:opacity-60"
       >
-        {state === "sending" ? "Надсилаємо…" : "Надіслати заявку"}
+        {state === "sending" ? f.sending : f.submit}
         <span className="transition-transform group-hover:translate-x-1">→</span>
       </button>
     </form>

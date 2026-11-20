@@ -1,0 +1,151 @@
+import type { Metadata } from "next";
+import Link from "@/components/i18n/Link";
+import { notFound } from "next/navigation";
+import { getArchiveYear, getArchiveYears, type CmsEvent } from "@/lib/cms";
+import { dateParts } from "@/lib/format";
+import { getLocale, getT, initPage, setLocale } from "@/lib/i18n/server";
+import { alternates } from "@/lib/i18n/seo";
+import { fill } from "@/lib/i18n/fill";
+import PageHead from "@/components/cms/PageHead";
+import EmptyState from "@/components/cms/EmptyState";
+import Reveal from "@/components/ui/Reveal";
+
+export const revalidate = 60;
+
+type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ year?: string }> };
+
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  setLocale((await params).locale);
+  const r = getT().reportsPage;
+  const { year } = await searchParams;
+  return {
+    title: year ? fill(r.metaTitleYear, { year }) : r.metaTitle,
+    alternates: alternates(year ? `/podiyi/zvity?year=${year}` : "/podiyi/zvity"),
+    description: r.metaDesc,
+  };
+}
+
+function ReportRow({ e }: { e: CmsEvent }) {
+  const r = getT().reportsPage;
+  const d = dateParts(e.start, getLocale());
+  return (
+    <Link
+      href={`/podiyi/${e.slug}#zvit`}
+      className="group grid items-baseline gap-3 border-b border-line py-7 md:grid-cols-[9rem_1fr_auto] md:gap-10"
+    >
+      <p className="text-sm tabular-nums text-mute">
+        {Number(d.day)} {d.month}
+      </p>
+      <div>
+        <h3 className="font-display text-[1.1rem] font-semibold leading-snug tracking-tight text-ink transition-colors group-hover:text-sky-700 md:text-[1.3rem]">
+          {e.title}
+        </h3>
+        {e.tags.length > 0 && (
+          <p className="eyebrow mt-2 text-sky-700">{e.tags.map((x) => x.title).join(" · ")}</p>
+        )}
+      </div>
+      <p className="flex items-center gap-4 whitespace-nowrap text-sm">
+        {e.report.gallery.length > 0 && (
+          <span className="text-mute">{fill(r.photos, { n: e.report.gallery.length })}</span>
+        )}
+        {e.hasReport ? (
+          <span className="font-medium text-ink">
+            {r.report} <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+          </span>
+        ) : (
+          <span className="text-mute">{r.reportSoon}</span>
+        )}
+      </p>
+    </Link>
+  );
+}
+
+/**
+ * Архів по роках: одна сторінка = один рік (?year=2025), за замовчуванням — найсвіжіший.
+ * Так сторінка не росте безкінечно, а в межах року подій небагато.
+ */
+export default async function Page({ params, searchParams }: Props) {
+  const { t } = await initPage(params);
+  const r = t.reportsPage;
+  const { year: yearParam } = await searchParams;
+  const years = await getArchiveYears(); // від нових до старих
+
+  const year = yearParam ? Number(yearParam) : years[0]?.year;
+  if (yearParam && !years.some((y) => y.year === year)) notFound();
+  const items = year ? await getArchiveYear(year) : [];
+
+  return (
+    <>
+      <PageHead
+        eyebrow={
+          <Link href="/podiyi" className="hover:text-ink">
+            {r.back}
+          </Link>
+        }
+        title={
+          <>
+            {r.h1A}<span className="text-sky-700">{r.h1B}</span>
+          </>
+        }
+        lead={r.lead}
+      />
+
+      <section className="bg-paper pb-28 pt-14 md:pt-16">
+        <div className="shell grid gap-12 lg:grid-cols-[10rem_1fr] lg:gap-16">
+          {years.length > 0 && (
+            <nav aria-label={r.years} className="lg:sticky lg:top-32 lg:self-start">
+              <p className="eyebrow text-mute">{r.years2}</p>
+              <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 lg:flex-col">
+                {years.map((y) => {
+                  const current = y.year === year;
+                  return (
+                    <li key={y.year}>
+                      <Link
+                        href={y.year === years[0].year ? "/podiyi/zvity" : `/podiyi/zvity?year=${y.year}`}
+                        aria-current={current ? "page" : undefined}
+                        className="group flex items-baseline gap-2"
+                      >
+                        <span
+                          className={`display text-[1.8rem] transition-colors group-hover:text-sky-700 ${
+                            current ? "text-sky-700" : "text-mute"
+                          }`}
+                        >
+                          {y.year}
+                        </span>
+                        <span className="text-xs tabular-nums text-mute">{y.count}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          )}
+
+          <div>
+            {!year ? (
+              <EmptyState
+                title={r.emptyTitle}
+                text={r.emptyText}
+                link={{ href: "/podiyi", label: t.nav.upcoming }}
+              />
+            ) : (
+              <section>
+                <Reveal>
+                  <div className="flex items-baseline justify-between border-b border-ink pb-4">
+                    <h2 className="display text-[clamp(1.92rem,4vw,3.04rem)] text-ink">{year}</h2>
+                    <p className="text-sm text-mute">
+                      {r.count(items.length)}
+                    </p>
+                  </div>
+                </Reveal>
+                {items.map((e) => (
+                  <ReportRow key={e.id} e={e} />
+                ))}
+              </section>
+            )}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import type { CmsEvent } from "@/lib/cms";
 import { dateParts, formatTimeSpan } from "@/lib/format";
 
@@ -6,6 +6,8 @@ import { dateParts, formatTimeSpan } from "@/lib/format";
  * Рядок події з великою датою. Заливка при наведенні виходить за межі контенту
  * (-inset-x-5 / md:-inset-x-8 / xl:-inset-x-10) — як на головній.
  */
+import { getLocale, getT } from "@/lib/i18n/server";
+
 export default function EventRow({
   event,
   showYear = true,
@@ -15,9 +17,11 @@ export default function EventRow({
   showYear?: boolean;
   compact?: boolean;
 }) {
-  const d = dateParts(event.start);
+  const t = getT();
+  const locale = getLocale();
+  const d = dateParts(event.start, locale);
   const past = event.status === "past";
-  const tags = event.tags.map((t) => t.title).join(" · ");
+  const tags = event.tags.map((x) => x.title).join(" · ");
 
   return (
     <Link href={`/podiyi/${event.slug}`} className="group relative block border-b border-line">
@@ -46,7 +50,7 @@ export default function EventRow({
             {event.status === "ongoing" && (
               <span className="inline-flex items-center gap-1.5 text-wheat-700 group-hover:text-wheat-400">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
-                Триває зараз
+                {t.event.ongoing}
               </span>
             )}
             {tags && <span>{tags}</span>}
@@ -64,12 +68,12 @@ export default function EventRow({
             </p>
           )}
           <p className="mt-2 text-sm text-mute transition-colors duration-500 group-hover:text-sky-100">
-            {formatTimeSpan(event.start, event.finish)}
+            {formatTimeSpan(event.start, event.finish, locale)}
           </p>
         </div>
 
         <span className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-ink transition-colors duration-500 group-hover:text-wheat-400">
-          {past ? (event.hasReport ? "Звіт" : "Деталі") : "Деталі"}
+          {past && event.hasReport ? t.event.report : t.event.details}
           <span className="inline-block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1">
             →
           </span>

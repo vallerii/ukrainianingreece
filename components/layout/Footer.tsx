@@ -1,13 +1,16 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import DonateLink from "@/components/donate/DonateLink";
 import { site, type NavItem } from "@/lib/site";
 import Image from "next/image";
 import SocialIcon from "@/components/ui/SocialIcon";
 import NewsletterForm from "./NewsletterForm";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; reportsHref?: string | null }) {
+  const t = useT();
+  const f = t.footer;
   return (
     <footer className="relative overflow-hidden bg-ink text-paper">
       <div className="shell py-20">
@@ -25,16 +28,16 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
               </span>
               <span className="max-w-[13rem]">
                 <span className="wordmark block text-[0.86rem] text-paper">
-                  Об&apos;єднана українська
+                  {t.site.nameLine1}
                 </span>
                 <span className="wordmark block text-[0.86rem] text-sky-100/70">
-                  діаспора в Греції
+                  {t.site.nameLine2}
                 </span>
               </span>
             </Link>
 
             <p className="mt-7 max-w-sm text-[0.95rem] leading-relaxed text-sky-100/70">
-              {site.slogan}. Мережа українських організацій, шкіл та ініціатив у Греції.
+              {t.site.slogan}. {f.about}
             </p>
 
             <div className="mt-8 flex gap-3">
@@ -57,7 +60,7 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
             <div>
               <Link href="/pro-nas" className="eyebrow text-wheat-400 transition-opacity hover:opacity-75">
-                Про нас
+                {f.aboutUs}
               </Link>
               <ul className="mt-4 space-y-2.5">
                 {nav[0].children!.map((c) => (
@@ -72,10 +75,10 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
 
             <div>
               <Link href="/proyekty" className="eyebrow text-wheat-400 transition-opacity hover:opacity-75">
-                Постійні проєкти
+                {f.projects}
               </Link>
               <ul className="mt-4 space-y-2.5">
-                {nav[3].children!.map((c) => (
+                {(nav.find((n) => n.href === "/proyekty")?.children ?? []).map((c) => (
                   <li key={c.label}>
                     <Link href={c.href} className="text-[0.92rem] text-sky-100/70 transition-colors hover:text-paper">
                       {c.label}
@@ -86,17 +89,17 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
             </div>
 
             <div>
-              <p className="eyebrow text-wheat-400">Розділи</p>
+              <p className="eyebrow text-wheat-400">{f.sections}</p>
               <ul className="mt-4 space-y-2.5">
                 {[
-                  { label: "Новини", href: "/novyny" },
-                  { label: "Блог", href: "/blog" },
-                  { label: "Прийдешні події", href: "/podiyi" },
-                  { label: "Звіти", href: "/podiyi/zvity" },
-                  ...(reportsHref ? [{ label: "Звіти про кошти", href: reportsHref }] : []),
-                  { label: "Корисна інформація", href: "/korysno" },
-                  { label: "Контакти", href: "/kontakty" },
-                  { label: "Підтримати", href: "/pidtrymaty" },
+                  { label: f.news, href: "/novyny" },
+                  { label: f.blog, href: "/blog" },
+                  { label: f.events, href: "/podiyi" },
+                  { label: f.reports, href: "/podiyi/zvity" },
+                  ...(reportsHref ? [{ label: f.money, href: reportsHref }] : []),
+                  { label: f.useful, href: "/korysno" },
+                  { label: f.contacts, href: "/kontakty" },
+                  { label: f.support, href: "/pidtrymaty" },
                 ].map((c) => (
                   <li key={c.href}>
                     {c.href === "/pidtrymaty" ? (
@@ -114,7 +117,7 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
             </div>
 
             <div className="sm:col-span-2 lg:col-span-2">
-              <p className="eyebrow text-wheat-400">Контакти</p>
+              <p className="eyebrow text-wheat-400">{f.contacts}</p>
               <ul className="mt-4 space-y-2.5 text-[0.92rem] text-sky-100/70">
                 <li>
                   <a href={`mailto:${site.email}`} className="link-underline hover:text-paper">
@@ -126,15 +129,15 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
                     {site.phone}
                   </a>
                 </li>
-                <li>{site.address}</li>
-                <li>{site.cities.join(" · ")}</li>
+                <li>{t.site.address}</li>
+                <li>{t.site.cities.join(" · ")}</li>
               </ul>
             </div>
 
             <div>
-              <p className="eyebrow text-wheat-400">Розсилка</p>
+              <p className="eyebrow text-wheat-400">{f.newsletter}</p>
               <p className="mt-4 text-[0.92rem] leading-relaxed text-sky-100/70">
-                Новини спільноти раз на місяць.
+                {f.newsletterLead}
               </p>
               <NewsletterForm />
             </div>
@@ -143,16 +146,16 @@ export default function Footer({ nav, reportsHref = null }: { nav: NavItem[]; re
 
         <div className="mt-16 flex flex-col gap-4 border-t border-white/12 pt-7 text-[0.8rem] text-sky-100/65 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {site.name}
+            © {new Date().getFullYear()} {t.site.name}
           </p>
           <div className="flex flex-wrap gap-6">
             <Link href="/polityka" className="hover:text-paper">
-              Політика конфіденційності
+              {f.privacy}
             </Link>
             <Link href="/kontakty#media" className="hover:text-paper">
-              Для медіа
+              {f.media}
             </Link>
-            <DonateLink className="text-wheat-400 hover:text-paper">Підтримати</DonateLink>
+            <DonateLink className="text-wheat-400 hover:text-paper">{f.support}</DonateLink>
           </div>
         </div>
       </div>
