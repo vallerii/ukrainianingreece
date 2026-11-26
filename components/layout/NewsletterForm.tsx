@@ -3,7 +3,7 @@
 import Link from "@/components/i18n/Link";
 import { useId, useState } from "react";
 import { site } from "@/lib/site";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useLocale, useT } from "@/components/i18n/I18nProvider";
 
 type State = "idle" | "sending" | "done" | "error";
 
@@ -11,6 +11,7 @@ type State = "idle" | "sending" | "done" | "error";
 /** Підписка на розсилку в підвалі сайту → /api/subscribe → Brevo (double opt-in). */
 export default function NewsletterForm() {
   const t = useT();
+  const locale = useLocale();
   const n = t.newsletter;
   const ERRORS: Record<string, string> = {
     email: n.errEmail,
@@ -36,6 +37,7 @@ export default function NewsletterForm() {
           email: data.get("email"),
           consent: data.get("consent") === "on",
           website_hp: data.get("website_hp"),
+          locale,
         }),
       });
       const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };

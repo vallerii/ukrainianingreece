@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { absoluteUrl } from "@/lib/seo";
+import { isLocale, localizeHref, defaultLocale } from "@/lib/i18n/config";
+import { brevo, brevoConfig } from "@/lib/newsletter/brevo";
 
 /**
  * POST /api/subscribe — підписка на розсилку через Brevo з подвійним підтвердженням (double opt-in).
@@ -8,10 +10,10 @@ import { absoluteUrl } from "@/lib/seo";
  * Людина отримує лист «Підтвердіть підписку»; у список вона потрапляє лише після кліку,
  * після чого Brevo повертає її на /rozsylka/pidtverdzheno.
  *
- * Змінні середовища:
- *   BREVO_API_KEY          — API key (Brevo → SMTP & API → API keys)
- *   BREVO_LIST_ID          — ID списку «Розсилка сайту» (Contacts → Lists)
- *   BREVO_DOI_TEMPLATE_ID  — ID шаблону листа-підтвердження (тип «Double opt-in»)
+ * Мова: форма надсилає мову сторінки (uk / en / el) — від неї залежать список,
+ * шаблон листа-підтвердження і сторінка, куди Brevo поверне людину (lib/newsletter/brevo.ts).
+ *
+ * Змінні середовища: BREVO_API_KEY (обов'язково); ID списків і шаблонів — див. brevoConfig().
  */
 
 const hits = new Map<string, number[]>();
@@ -43,25 +45,20 @@ export async function POST(req: Request) {
   if (!isEmail(email)) return NextResponse.json({ ok: false, error: "email" }, { status: 400 });
   if (body.consent !== true) return NextResponse.json({ ok: false, error: "consent" }, { status: 400 });
 
+  const locale = isLocale(body.locale) ? body.locale : defaultLocale;
   const apiKey = process.env.BREVO_API_KEY;
-  const listId = Number(process.env.BREVO_LIST_ID);
-  const templateId = Number(process.env.BREVO_DOI_TEMPLATE_ID);
-  if (!apiKey || !listId || !templateId) {
-    console.error("[subscribe] Brevo не налаштовано: BREVO_API_KEY / BREVO_LIST_ID / BREVO_DOI_TEMPLATE_ID");
+  const { listId, templateId } = brevoConfig(locale);
+  if (!apiKey) {
+    console.error("[subscribe] Brevo не налаштовано: BREVO_API_KEY");
     return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
   }
 
   try {
-    const res = await fetch("https://api.brevo.com/v3/contacts/doubleOptinConfirmation", {
-      method: "POST",
-      headers: { "api-key": apiKey, "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({
-        email,
-        includeListIds: [listId],
-        templateId,
-        redirectionUrl: absoluteUrl("/rozsylka/pidtverdzheno"),
-      }),
-      cache: "no-store",
+    const res = await brevo("/contacts/doubleOptinConfirmation", apiKey, {
+      email,
+      includeListIds: [listId],
+      templateId,
+      redirectionUrl: absoluteUrl(localizeHref("/rozsylka/pidtverdzheno", locale)),
     });
     if (res.ok) return NextResponse.json({ ok: true });
 

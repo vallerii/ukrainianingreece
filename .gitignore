@@ -13,3 +13,6 @@ tsconfig.tsbuildinfo
 # кеш завантажених логотипів (scripts/datocms-seed-organizations.mjs)
 scripts/.datocms-uploads.json
 .claude-tmp/
+
+# локальний мотлох, не для git
+_to_delete/
