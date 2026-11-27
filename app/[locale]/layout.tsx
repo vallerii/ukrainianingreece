@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import "../globals.css";
+import { JsonLd, siteGraph } from "@/lib/jsonld";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import DonateDialog from "@/components/donate/DonateDialog";
@@ -73,6 +74,7 @@ export default async function RootLayout({ children, params }: Props) {
         />
       </head>
       <body className="antialiased">
+        <JsonLd data={siteGraph(locale)} />
         <a
           href="#zmist"
           className="sr-only z-[100] rounded-full bg-ink px-5 py-3 text-sm font-bold text-paper focus:not-sr-only focus:fixed focus:left-4 focus:top-4"

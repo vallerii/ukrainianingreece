@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { getEvent, getEventSlugs, getUpcomingEvents, type CmsEvent } from "@/lib/cms";
 import { formatRange } from "@/lib/format";
 import { initPage, setLocale } from "@/lib/i18n/server";
-import { alternates } from "@/lib/i18n/seo";
+import { alternates, pageOpenGraph } from "@/lib/i18n/seo";
+import { JsonLd, eventLd } from "@/lib/jsonld";
 import PageHead from "@/components/cms/PageHead";
 import Gallery from "@/components/ui/Gallery";
 import RichText from "@/components/cms/RichText";
@@ -30,11 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: event.title,
     description: event.description,
     alternates: alternates(`/podiyi/${event.slug}`),
-    openGraph: {
-      title: event.title,
-      description: event.description,
-      images: event.image ? [{ url: event.image.url }] : undefined,
-    },
+    openGraph: pageOpenGraph({ title: event.title, description: event.description, image: event.image?.url }),
   };
 }
 
@@ -77,6 +74,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
+      <JsonLd data={eventLd(event, locale)} />
       <PageHead
         eyebrow={
           <span className="flex flex-wrap items-center gap-4">

@@ -9,7 +9,8 @@ import RichText from "@/components/cms/RichText";
 import Cover from "@/components/cms/Cover";
 import SectionHead from "@/components/ui/SectionHead";
 import { initPage, setLocale } from "@/lib/i18n/server";
-import { alternates } from "@/lib/i18n/seo";
+import { alternates, pageOpenGraph } from "@/lib/i18n/seo";
+import { JsonLd, articleLd } from "@/lib/jsonld";
 import { localizeHref } from "@/lib/i18n/config";
 import Media from "@/components/cms/Media";
 import { getMedia } from "@/lib/media";
@@ -31,13 +32,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: article.title,
     description,
     alternates: alternates(article.href),
-    openGraph: {
+    openGraph: pageOpenGraph({
       type: "article",
       title: article.title,
       description,
       publishedTime: article.date,
-      images: article.image ? [{ url: article.image.url }] : undefined,
-    },
+      image: article.image?.url,
+    }),
   };
 }
 
@@ -59,6 +60,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
+      <JsonLd data={articleLd(article, locale, excerpt(article.html, 160), "NewsArticle")} />
       <PageHead
         eyebrow={
           <span className="flex flex-wrap items-center gap-4">

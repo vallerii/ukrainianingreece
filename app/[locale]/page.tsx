@@ -11,7 +11,15 @@ import { buildStats } from "@/lib/site";
 
 export const revalidate = 60;
 
-import { initPage } from "@/lib/i18n/server";
+import type { Metadata } from "next";
+import { initPage, setLocale } from "@/lib/i18n/server";
+import { alternates } from "@/lib/i18n/seo";
+
+// головна теж отримує canonical і hreflang (як решта сторінок)
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  setLocale((await params).locale);
+  return { alternates: alternates("/") };
+}
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { t } = await initPage(params);

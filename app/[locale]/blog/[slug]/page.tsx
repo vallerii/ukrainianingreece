@@ -12,7 +12,8 @@ import Cover from "@/components/cms/Cover";
 import Media from "@/components/cms/Media";
 import SectionHead from "@/components/ui/SectionHead";
 import { initPage, setLocale } from "@/lib/i18n/server";
-import { alternates } from "@/lib/i18n/seo";
+import { alternates, pageOpenGraph } from "@/lib/i18n/seo";
+import { JsonLd, articleLd } from "@/lib/jsonld";
 import { localizeHref } from "@/lib/i18n/config";
 
 export const revalidate = 60;
@@ -32,13 +33,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: post.title,
     description,
     alternates: alternates(post.href),
-    openGraph: {
+    openGraph: pageOpenGraph({
       type: "article",
       title: post.title,
       description,
       publishedTime: post.date,
-      images: post.image ? [{ url: post.image.url }] : undefined,
-    },
+      image: post.image?.url,
+    }),
   };
 }
 
@@ -53,6 +54,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
+      <JsonLd data={articleLd(post, locale, excerpt(post.html, 160), "BlogPosting")} />
       <PageHead
         eyebrow={
           <Link href={BLOG_HREF} className="hover:text-ink">
