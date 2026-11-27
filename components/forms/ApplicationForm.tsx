@@ -6,6 +6,7 @@ import { type FormKind } from "@/lib/forms";
 import { useT } from "@/components/i18n/I18nProvider";
 import { fill } from "@/lib/i18n/fill";
 import { Area, Chips, ConsentAndHoneypot, Field, Select } from "./fields";
+import Turnstile, { resetTurnstile } from "./Turnstile";
 
 type State = "idle" | "sending" | "done" | "error";
 
@@ -17,6 +18,7 @@ export default function ApplicationForm({ kind }: { kind: FormKind }) {
     validation: f.errValidation,
     consent: f.errConsent,
     rate_limited: f.errRate,
+    captcha: f.errCaptcha,
     not_configured: f.errConfig,
   };
   const [state, setState] = useState<State>("idle");
@@ -24,7 +26,8 @@ export default function ApplicationForm({ kind }: { kind: FormKind }) {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const data: Record<string, unknown> = { kind, consent: fd.get("consent") === "on" };
     for (const [k, v] of fd.entries()) if (k !== "consent" && k !== "skills") data[k] = v;
     data.skills = fd.getAll("skills");
@@ -39,9 +42,11 @@ export default function ApplicationForm({ kind }: { kind: FormKind }) {
       });
       const json = await res.json().catch(() => ({}));
       if (res.ok && json.ok) return setState("done");
+      resetTurnstile(form);
       setError(ERRORS[json.error] ?? fill(f.errGeneric, { email: site.email }));
       setState("error");
     } catch {
+      resetTurnstile(form);
       setError(fill(f.errNetwork, { email: site.email }));
       setState("error");
     }
@@ -100,6 +105,8 @@ export default function ApplicationForm({ kind }: { kind: FormKind }) {
           {error}
         </p>
       )}
+
+      <Turnstile className="mb-6" />
 
       <button
         type="submit"

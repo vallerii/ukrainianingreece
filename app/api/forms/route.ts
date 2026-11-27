@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { verifyTurnstile } from "@/lib/turnstile";
 import { CmaNotConfigured, FORM_MODELS, createRecord } from "@/lib/datocms-cma";
 import type { FormKind } from "@/lib/forms";
 import { slugify } from "@/lib/format";
@@ -33,6 +34,10 @@ export async function POST(req: Request) {
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
   if (tooMany(ip)) return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
+  // Cloudflare Turnstile (якщо ключі задані) — див. lib/turnstile.ts
+  if (!(await verifyTurnstile(body["cf-turnstile-response"], ip))) {
+    return NextResponse.json({ ok: false, error: "captcha" }, { status: 400 });
+  }
 
   const kind = body.kind as FormKind;
   if (body.consent !== true) return NextResponse.json({ ok: false, error: "consent" }, { status: 400 });

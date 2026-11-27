@@ -4,6 +4,7 @@ import Link from "@/components/i18n/Link";
 import { useId, useState } from "react";
 import { site } from "@/lib/site";
 import { useLocale, useT } from "@/components/i18n/I18nProvider";
+import Turnstile, { resetTurnstile } from "@/components/forms/Turnstile";
 
 type State = "idle" | "sending" | "done" | "error";
 
@@ -17,6 +18,7 @@ export default function NewsletterForm() {
     email: n.errEmail,
     consent: n.errConsent,
     rate_limited: n.errRate,
+    captcha: n.errCaptcha,
     not_configured: `${n.errConfig} ${site.email}`,
   };
   const id = useId();
@@ -38,6 +40,7 @@ export default function NewsletterForm() {
           consent: data.get("consent") === "on",
           website_hp: data.get("website_hp"),
           locale,
+          "cf-turnstile-response": data.get("cf-turnstile-response"),
         }),
       });
       const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
@@ -45,10 +48,12 @@ export default function NewsletterForm() {
         setState("done");
         form.reset();
       } else {
+        resetTurnstile(form);
         setState("error");
         setError(ERRORS[json.error ?? ""] ?? n.errGeneric);
       }
     } catch {
+      resetTurnstile(form);
       setState("error");
       setError(n.errNetwork);
     }
@@ -86,6 +91,8 @@ export default function NewsletterForm() {
           {state === "sending" ? "…" : "→"}
         </button>
       </div>
+
+      <Turnstile theme="dark" className="mt-4" />
 
       {/* пастка для ботів: людина цього поля не бачить */}
       <div aria-hidden="true" className="absolute left-[-9999px] h-px w-px overflow-hidden">
